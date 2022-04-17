@@ -1,0 +1,6 @@
+interface userMap {
+  id: string
+  name: string
+  nickname: string
+  avatar: string
+}

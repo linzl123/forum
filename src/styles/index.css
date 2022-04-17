@@ -1,0 +1,163 @@
+body {
+  background-color: #ecf5ff;
+  margin: 0;
+}
+
+.iconfont {
+  font-size: 32px;
+  cursor: pointer;
+}
+
+/*帖子、评论详情*/
+.sender-info {
+  text-align: center;
+  background-color: #fbfbfd;
+}
+
+.content-main {
+  min-height: 200px;
+}
+
+.content-text {
+  white-space: pre-wrap;
+}
+
+.content-img {
+  max-height: 200px;
+  max-width: 100%;
+  object-fit: scale-down;
+}
+
+.content-tail {
+  display: flex;
+  margin-top: 0.6rem;
+  font-size: 0.7rem;
+  justify-content: end;
+  align-items: center;
+}
+
+.agree-icon {
+  height: 20px;
+  width: 20px;
+  cursor: pointer;
+}
+
+.agree-number {
+  min-width: 3em;
+  margin: 0 3px;
+}
+
+/*头像*/
+.img-32 {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.img-80 {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+/*发送框*/
+.send-item {
+  margin-bottom: 1rem;
+}
+
+.at-list {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.at-tag {
+  margin-right: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.at-input {
+  width: 10rem !important;
+  margin-bottom: 1rem;
+}
+
+/*Message*/
+.message-content {
+  width: 95%;
+}
+
+.unread-icon {
+  width: 0;
+  height: 0;
+  border-top: 30px solid red;
+  border-right: 30px solid transparent;
+  position: absolute;
+  top: -26px;
+  left: -20px;
+}
+
+.unread-icon:hover {
+  cursor: pointer;
+}
+
+.msg-head {
+  display: flex;
+  justify-content: space-between;
+}
+
+/*字体颜色*/
+
+.title-text {
+  color: #222222;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.title-text:hover {
+  color: #ff0000;
+}
+
+.sender-text {
+  color: #999999;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.sender-text:hover {
+  color: #337ecc;
+}
+
+.time-text {
+  color: #999999;
+  font-size: 14px;
+}
+
+.user-nickname {
+  color: #337ecc;
+  cursor: pointer;
+}
+
+.handle-text {
+  color: #409EFF;
+  cursor: pointer;
+}
+
+.content-time {
+  color: #999999;
+}
+
+.delete-speak {
+  color: #f56c6c;
+  cursor: pointer;
+}
+
+/*过渡*/
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 300ms ease;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
