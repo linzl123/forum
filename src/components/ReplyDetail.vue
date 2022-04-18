@@ -243,8 +243,8 @@ const sendReply = debounce(async () => {
     store.commit("alert", {message: "回复成功", type: "success"})
   } else if (res.state === 101) {
     if (res.state_message.startsWith("回复")) {
-      tagRef.value.$emit("close")
       emits("delReply", target.value)
+      tagRef.value.$emit("close")
       store.commit("alert", {message: "引用已被删除，无法回复", type: "warning"})
     } else {
       emits("removedComment")
