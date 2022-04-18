@@ -6,7 +6,7 @@
     </label>
     &ensp;<span class="img-name">{{ imgName }}</span>
     <img :src="imgSrc" class="send-img-hover"/>
-    <span v-show="imgName!==''" class="delete-speak" @click="removeImg">✖</span>
+    <span v-show="imgName!==''" class="delete-image" @click="removeImg">✖</span>
   </div>
 </template>
 

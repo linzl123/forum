@@ -50,7 +50,7 @@
         <label for="img" class="send-img">添加图片</label>
         &ensp;<span class="send-img-text">{{ imgName }}</span>
         <img :src="imgSrc" class="send-img-hover"/>
-        <span v-show="imgName!==''" class="content-text" @click="remove">✖</span>
+        <span v-show="imgName!==''" class="delete-image" @click="remove">✖</span>
       </div>
       <div>
         <el-input type="textarea" v-model="content" :rows="5"
@@ -136,10 +136,10 @@ const remove = () => {
 }
 const beforeUpload = (file) => {
   if (!file) return
-  const isJPG = file.type === "image/jpeg"
+  const isJPG = file.type === "image/jpeg" || file.type === "image/png"
   const isLt1M = file.size / 1024 / 1024 < 1
   if (!isJPG) {
-    store.commit("alert", {message: "文件格式必须为 JPG", type: "error"})
+    store.commit("alert", {message: "文件格式必须为 JPG 或 PNG", type: "error"})
   } else if (!isLt1M) {
     store.commit("alert", {message: "文件大小必须小于 1MB", type: "error"})
   }
@@ -147,7 +147,11 @@ const beforeUpload = (file) => {
 }
 const upload = (e) => {
   imgFile = e.target.files[0]
-  if (!imgFile || !beforeUpload(imgFile)) return
+  if (!imgFile || !beforeUpload(imgFile)) {
+    imgRef.value.value = ""
+    imgFile = null
+    return
+  }
   imgName.value = imgFile.name
   URL.revokeObjectURL(imgSrc.value)
   imgSrc.value = URL.createObjectURL(imgFile)

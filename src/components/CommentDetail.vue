@@ -62,7 +62,8 @@
       <el-row class="reply-area">
         <reply-detail v-show="showReply" :replies="comment.replies" :cid="comment.cid"
                       :lz-uid="lzUid" :cz-uid="comment.u_id"
-                      @getReplies="getReplies" @delReply="delReply">
+                      @getReplies="getReplies" @delReply="delReply"
+                      @removedComment="removedComment(comment.cid)">
         </reply-detail>
       </el-row>
     </el-col>
@@ -102,14 +103,16 @@ const unfoldReply = () => {
   emits("getReplies")
   showReply.value = true
 }
+
+const commentKey = (cid) => "c" + cid
+// 子组件事件 reply-detail
 const getReplies = () => {
   emits("getReplies", comment)
 }
+
 const delReply = (rid) => {
   comment.value.replies.splice(comment.value.replies.findIndex((i) => i.reply_id === rid), 1)
 }
-
-const commentKey = (cid) => "c" + cid
 
 const deleteComment = debounce(async (comment) => {
   let message, type
@@ -124,6 +127,10 @@ const deleteComment = debounce(async (comment) => {
   }
   store.commit("alert", {message, type})
 })
+
+const removedComment = (cid) => {
+  emits("delComment", cid)
+}
 // 赞同 or 不赞同
 const UNKNOWN_COLOR = "#8a8a8a"
 const ENSURE_COLOR = "#1296db"

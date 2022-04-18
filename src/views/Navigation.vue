@@ -130,7 +130,6 @@ const profileList = [
 ]
 //WebSocket
 const wsUrl = import.meta.env.VITE_WS_URL
-let lockReconnect = false
 const createWebSocket = () => {
   try {
     window.ws = new WebSocket(wsUrl)
@@ -149,12 +148,11 @@ function init() {
     reconnect(wsUrl)
   }
   window.ws.onmessage = (e) => {
-    console.log(e)
-    console.log(JSON.parse(e.data))
     store.commit("addMessage", JSON.parse(e.data).message_type)
   }
 }
 
+let lockReconnect = false
 function reconnect(url) {
   if (lockReconnect) return
   lockReconnect = true

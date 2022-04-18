@@ -53,9 +53,11 @@
           <template #prefix>@</template>
         </el-input>
       </div>
-      <el-input v-model="content" placeholder="内容" ref="replyInputRef"/>
+      <el-input v-model="content" placeholder="内容" ref="replyInputRef"
+                @keyup.ctrl.enter.exact="sendReply"/>
       <div class="reply-input-tail">
-        <el-tag v-show="target" class="reply-cite" closable type="success" size="large" @close="closeCite">
+        <el-tag v-show="target" class="reply-cite" closable type="success" size="large" @close="closeCite"
+                ref="tagRef">
           {{ cite }}
         </el-tag>
         <el-button type="primary" size="small" @click="sendReply" class="reply-send">发送</el-button>
@@ -92,7 +94,7 @@ const props = defineProps({
   },
 })
 const {replies} = toRefs(props)
-const emits = defineEmits(["getReplies", "delReply"])
+const emits = defineEmits(["getReplies", "delReply", "removedComment"])
 const router = useRouter()
 const target = ref(0)
 const replyInputRef = ref(null)
@@ -214,6 +216,7 @@ const removeAt = (at) => {
   atList.value.splice(atList.value.indexOf(at), 1)
 }
 //回复
+const tagRef = ref()
 const replyTarget = (rid) => {
   target.value = rid
   replyInputRef.value.focus()
@@ -227,24 +230,29 @@ const sendReply = debounce(async () => {
     store.commit("alert", {message: "内容不能为空", type: "error"})
     return
   }
-  let message, type
   let atObj = {}
   atList.value.forEach((at) => {
     atObj[at[0]] = at[1]
   })
   let res = await createReply(props.cid, content.value, target.value, atObj)
   if (res.state === 100) {
-    message = "回复成功"
-    type = "success"
     target.value = 0
     content.value = ""
     atList.value = []
     emits("getReplies")
+    store.commit("alert", {message: "回复成功", type: "success"})
+  } else if (res.state === 101) {
+    if (res.state_message.startsWith("回复")) {
+      tagRef.value.$emit("close")
+      emits("delReply", target.value)
+      store.commit("alert", {message: "引用已被删除，无法回复", type: "warning"})
+    } else {
+      emits("removedComment")
+      store.commit("alert", {message: "评论已被删除，无法回复", type: "warning"})
+    }
   } else {
-    message = res.state_message
-    type = "error"
+    store.commit("alert", {message: res.state_message, type: "error"})
   }
-  store.commit("alert", {message, type})
 })
 //
 processReplies()

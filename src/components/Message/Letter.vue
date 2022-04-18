@@ -67,7 +67,7 @@ const getMessage = async () => {
     msgKeys.value.forEach((v, i) => {
       reqUser[i] = getUserByUid(Number(v))
       msgList.value[v].forEach((v2) => {
-        v2.chat_time = v2.chat_time.slice(0, 10) + " " + v2.chat_time.slice(11, 16)
+        v2.chat_time = v2.chat_time.slice(0, 10) + " " + v2.chat_time.slice(11, 19)
       })
     })
     await Promise.all(reqUser)

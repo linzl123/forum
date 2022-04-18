@@ -33,7 +33,7 @@
           </template>
           <div v-for="(zone,idx) in zoneList">
             <div class="zone-intro">
-              <el-avatar class="zone-logo" :size="70" :src="zone.logo" @click="goto(idx)"></el-avatar>
+              <el-avatar class="zone-logo" :size="70" :src="zone.logo" @click="gotoZone(idx)"></el-avatar>
               <div class="zone-text">
                 <span class="zone-title" @click="gotoZone(idx)">{{ zone.title }}</span>
                 <div>{{ zone.slogan }}</div>

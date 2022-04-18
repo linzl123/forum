@@ -147,6 +147,11 @@ body {
   color: #999999;
 }
 
+.delete-image {
+  color: #f56c6c;
+  cursor: pointer;
+}
+
 .delete-speak {
   color: #f56c6c;
   cursor: pointer;

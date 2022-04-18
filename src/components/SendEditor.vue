@@ -32,6 +32,7 @@ import {createPost} from "@/api/post.js"
 import {getUserIdByNickname} from "@/api/user.js"
 import {validateAtInput} from "@/utils/validate.js"
 import {createComment} from "@/api/comment.js"
+import {useRouter} from "vue-router"
 
 const props = defineProps({
     mode: {
@@ -51,6 +52,7 @@ const props = defineProps({
 )
 const emits = defineEmits(["sendSuccess"])
 const content = ref("")
+const router=useRouter()
 //引用
 const inputRef = ref()
 defineExpose({inputRef})
@@ -151,6 +153,9 @@ const send = async () => {
       atList.value = []
       emits("sendSuccess")
       store.commit("alert", {message: "评论成功", type: "success"})
+    } else if (res.state === 101) {
+      router.replace({path: history.state.back})
+      store.commit("alert", {message: "帖子已被删除，无法评论", type: "warning"})
     } else {
       store.commit("alert", {message: res.state_message, type: "error"})
     }
