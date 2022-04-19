@@ -211,7 +211,7 @@ const toComment = () => {
 const deletePost = async () => {
   let message, type
   let res = await deletePostByPid(pid)
-  if (res.state === 100) {
+  if (res.state === 100 || res.state === 101) {
     message = "删除成功"
     type = "success"
     router.replace({path: history.state.back})

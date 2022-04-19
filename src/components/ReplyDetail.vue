@@ -175,10 +175,9 @@ const gotoCite = (reply) => {
 const deleteReply = debounce(async (reply) => {
   let message, type
   let res = await deleteReplyByRid(reply.reply_id)
-  if (res.state === 100) {
+  if (res.state === 100 || res.state === 101) {
     message = "删除成功"
     type = "success"
-    reply.own = false
     emits("delReply", reply.reply_id)
   } else {
     message = res.state_message

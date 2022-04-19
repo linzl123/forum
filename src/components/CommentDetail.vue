@@ -117,7 +117,7 @@ const delReply = (rid) => {
 const deleteComment = debounce(async (comment) => {
   let message, type
   let res = await deleteCommentByCid(comment.cid)
-  if (res.state === 100) {
+  if (res.state === 100 || res.state === 101) {
     message = "删除成功"
     type = "success"
     emits("delComment", comment.cid)
