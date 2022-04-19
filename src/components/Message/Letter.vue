@@ -54,7 +54,7 @@ const msgKeys = computed(() => Object.keys(msgList.value))
 const unreadLettersList = computed(() => {
   const obj = {}
   msgKeys.value.forEach((v) => {
-    obj[v] = msgList.value[v].filter(v2 => v2.is_unread).map(v3 => v3.chat_id)
+    obj[v] = msgList.value[v].filter(v2 => v2.is_unread).map(v3 => v3.chat_id) ?? []
   })
   return obj
 })
@@ -62,15 +62,16 @@ const activeUid = ref("")
 const getMessage = async () => {
   let res = await getLetterMessage()
   if (res.chat_infos) {
-    msgList.value = res.chat_infos
-    let reqUser = Array(msgKeys.value.length)
-    msgKeys.value.forEach((v, i) => {
+    let keys = Object.keys(res.chat_infos)
+    let reqUser = Array(keys.length)
+    keys.forEach((v, i) => {
       reqUser[i] = getUserByUid(Number(v))
-      msgList.value[v].forEach((v2) => {
+      res["chat_infos"][v].forEach((v2) => {
         v2.chat_time = v2.chat_time.slice(0, 10) + " " + v2.chat_time.slice(11, 19)
       })
     })
     await Promise.all(reqUser)
+    msgList.value = res.chat_infos
   }
   if (store.state.gotoLetter) {
     if (msgKeys.value.indexOf(store.state.gotoLetter) === -1) {
@@ -89,7 +90,8 @@ const getMessage = async () => {
 window.ws.addEventListener("message", (e) => {
   if (JSON.parse(e.data).message_type === 3) {
     if (msgKeys.value.length === 0) isLoading.value = true
-    getMessage().then(() => {
+    getMessage().then((ret) => {
+      activeUid.value = activeUid.value ?? ret
       isLoading.value = false
     })
   }

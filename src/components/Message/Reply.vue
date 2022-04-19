@@ -46,18 +46,18 @@ const msgList = ref([])
 const getMessage = async () => {
   let res = await getReplyMessage()
   if (res.reply_messages) {
-    msgList.value = res.reply_messages
-    let reqUser = Array(msgList.value.length)
-    msgList.value.forEach((v, i) => {
+    let reqUser = Array(res.reply_messages.length)
+    res.reply_messages.forEach((v, i) => {
       v.handle = true
       v.handleText = "移除"
       v.reply_time = v.reply_time.slice(0, 10) + " " + v.reply_time.slice(11, 16)
       reqUser[i] = getUserByUid(v.reply_u_id)
     })
     let resUser = await Promise.all(reqUser)
-    msgList.value.forEach((v, i) => {
+    res.reply_messages.forEach((v, i) => {
       v.nickname = resUser[i].nickname
     })
+    msgList.value = res.reply_messages
   }
   isLoading.value = false
 }

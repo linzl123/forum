@@ -46,9 +46,8 @@ const msgList = ref([])
 const getMessage = async () => {
   let res = await getAtMessage()
   if (res.at_messages) {
-    msgList.value = res.at_messages
-    let reqUser = Array(msgList.value.length)
-    msgList.value.forEach((v, i) => {
+    let reqUser = Array(res.at_messages.length)
+    res.at_messages.forEach((v, i) => {
       reqUser[i] = getUserByUid(v.caller_u_id)
       v.handle = true
       v.handleText = "移除"
@@ -57,9 +56,10 @@ const getMessage = async () => {
       v.id = src[1]
     })
     let resUser = await Promise.all(reqUser)
-    msgList.value.forEach((v, i) => {
+    res.at_messages.forEach((v, i) => {
       v.nickname = resUser[i].nickname
     })
+    msgList.value = res.at_messages
   }
   isLoading.value = false
 }

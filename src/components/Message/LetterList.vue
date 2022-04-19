@@ -56,7 +56,7 @@
         <el-input type="textarea" v-model="content" :rows="5"
                   @keyup.ctrl.enter.exact="send" class="send-input"/>
       </div>
-      <div>
+      <div class="send-btn-box">
         <el-button color="#1389BF" @click="send" class="send-btn" :loading="sendLoading">
           发送
         </el-button>
@@ -327,11 +327,15 @@ onUnmounted(() => {
   background-color: #79bbff;
 }
 
+.send-btn-box {
+  display: flex;
+  justify-content: right;
+}
+
 .send-btn {
   color: white;
   margin-top: 5px;
   height: 25px;
-  float: right;
 }
 
 .new-message {
