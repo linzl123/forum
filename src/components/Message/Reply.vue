@@ -12,7 +12,7 @@
         <el-row v-for="reply in msgList" :key="reply.reply_id">
           <el-col :span="17">
             <div class="unread-icon" v-if="reply.is_unread" @click="removeUnread(reply)"></div>
-            <span class="content-text message-content" @click="goto(reply)">{{ reply.reply_txt }}</span>
+            <span class="message-text" @click="goto(reply)">{{ reply.reply_txt }}</span>
           </el-col>
           <el-col :span="5">
             <span class="sender-text" @click="router.push('/profile/'+reply.reply_u_id)">{{ reply.nickname }}</span>
@@ -137,11 +137,4 @@ getMessage()
 </script>
 
 <style scoped>
-.reply-text {
-  cursor: pointer;
-}
-
-.reply-text:hover {
-  color: #ff0000;
-}
 </style>

@@ -30,7 +30,7 @@ import AddPicture from "@/components/AddPicture.vue"
 import store from "@/store"
 import {createPost} from "@/api/post.js"
 import {getUserIdByNickname} from "@/api/user.js"
-import {validateAtInput} from "@/utils/validate.js"
+import {checkNickname} from "@/utils/validate.js"
 import {createComment} from "@/api/comment.js"
 import {useRouter} from "vue-router"
 
@@ -62,7 +62,7 @@ const atInput = ref("")
 const atList = ref([])
 const handleAtInput = async () => {
   if (atInput.value === "") return
-  if (validateAtInput(atInput.value)) {
+  if (checkNickname(atInput.value)) {
     if (store.state.userMap.get(store.state.ownId).nickname === atInput.value) {
       store.commit("alert", {message: "禁止自娱自乐", type: "warning"})
     } else if (atList.value.findIndex((at) => at[1] === atInput.value) > -1) {

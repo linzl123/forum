@@ -1,44 +1,55 @@
 <template>
-  <el-card class="box-card">
-    <el-form ref="formRef" :model="loginForm" :rules="rules">
-      <el-form-item label="帐号" prop="username">
-        <el-input v-model="loginForm.username" type="text" autocomplete="on" ref="accountInput"></el-input>
-      </el-form-item>
-      <el-form-item label="密码" prop="password">
-        <el-input v-model="loginForm.password" type="password" show-password autocomplete="off"></el-input>
-      </el-form-item>
-      <div class="btn-card">
-        <el-button type="primary" :loading="loading" @click="signin">
-          登录
-        </el-button>
-        <el-button type="primary" @click="router.push('/register')">
-          注册
-        </el-button>
+  <div class="login-bg">
+    <div class="login-card">
+      <div class="login-header">欢迎回来</div>
+      <div class="login-body">
+        <el-form ref="formRef" :model="loginForm" :rules="rules" label-width="4em">
+          <el-form-item label="帐号" prop="username">
+            <el-input v-model="loginForm.username" type="text" autocomplete="on" ref="accountInput"></el-input>
+          </el-form-item>
+          <el-form-item label="密码" prop="password">
+            <el-input v-model="loginForm.password" type="password" show-password autocomplete="off"></el-input>
+          </el-form-item>
+          <el-button type="primary" size="large" style="width: 100%;" :loading="loading" @click="signin">
+            登录
+          </el-button>
+          <div class="forget-register">
+            <span class="forget-register-item" @click="changePwd">忘记密码</span>
+            <span class="forget-register-item" @click="router.push('/register')">
+            新用户
+          </span>
+          </div>
+        </el-form>
       </div>
-    </el-form>
-  </el-card>
+    </div>
+    <modify-password :pwd-dialog="pwdDialog" :question="question" @close="pwdDialog=false"></modify-password>
+  </div>
 </template>
 
 <script setup>
-import {onMounted, reactive, ref} from "vue"
+import {computed, onMounted, reactive, ref} from "vue"
 import {useRoute, useRouter} from "vue-router"
-import {login, register} from "@/api/user"
+import {fetchPasswordQuestion, login} from "@/api/user"
 import store from "@/store"
-import {debounce} from "@/utils/debounce.js"
-import {validateNickname, validatePassword, validateUsername} from "@/utils/validate"
+import {validatePassword, validateUsername, checkNickname} from "@/utils/validate"
+import ModifyPassword from "@/components/ModifyPassword.vue"
+
+const router = useRouter()
+if (store.state.ownId !== 0) {
+  router.push("/")
+}
 
 const loginForm = reactive({
   username: "123",
   password: "123",
 })
 const accountInput = ref() //帐号框
-const router = useRouter()
 const route = useRoute()
 
 const formRef = ref()
 const rules = reactive({
-  username: [{validator: validateUsername, trigger: "change"}],
-  password: [{validator: validatePassword, trigger: "change"}],
+  username: [{required: true, validator: validateUsername}],
+  password: [{required: true, validator: validatePassword}],
 })
 
 onMounted(() => {
@@ -54,26 +65,82 @@ const signin = () => {
       if (res.state === 100) {
         store.commit("alert", {message: "登录成功", type: "success"})
         localStorage.setItem("uname", loginForm.username)
-        if (route.query.to) router.push(route.query.to)
-        else router.push("/")
+        if (route.query.to) await router.push(route.query.to)
+        else await router.push("/")
       } else {
         store.commit("alert", {message: res.state_message, type: "error"})
       }
     }
+    loading.value = false
   })
-  loading.value = false
+}
+// 忘记密码
+const pwdDialog = ref(false)
+const changePwdLoading = ref(false)
+const question = ref("")
+const changePwd = async () => {
+  if (checkNickname(loginForm.username)) {
+    changePwdLoading.value = true
+    let res = await fetchPasswordQuestion(loginForm.username)
+    if (res.state === 100) {
+      question.value = res.password_question
+      pwdDialog.value = true
+    } else if (res.state === 101) {
+      store.commit("alert", {message: "该用户不存在", type: "warning"})
+    } else {
+      store.commit("alert", {message: "服务器出错", type: "error"})
+    }
+    changePwdLoading.value = false
+  } else {
+    store.commit("alert", {message: "请输入合法的帐号", type: "warning"})
+  }
 }
 </script>
 
 <style scoped>
-.box-card {
-  width: 300px;
-  margin: 11rem auto;
+.login-bg {
+  width: 100vw;
+  height: 100vh;
+  background: url("/image/login-bg.jpg");
 }
 
-.btn-card {
+.login-card {
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 350px;
+}
+
+.login-header {
+  padding: 30px;
+  background-color: #d9ebf8;
+  text-align: center;
+  font-size: 28px;
+  color: #1890ff;
+  border-radius: 5px 5px 0 0;
+}
+
+.login-body {
+  border-radius: 0 0 5px 5px;
+  padding: 20px;
+  background: #ffffff;
+}
+
+.forget-register {
   display: flex;
-  justify-content: space-evenly;
-  margin-top: 1.2rem;
+  justify-content: space-around;
+  margin-top: 12px;
+  font-size: 12px;
+  color: #909399;
+}
+
+.forget-register-item {
+  cursor: pointer;
+}
+
+.forget-register-item:hover {
+  color: #000000;
 }
 </style>

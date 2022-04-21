@@ -9,10 +9,8 @@
           <div class="top-body">
             <el-row v-for="post in topPostList" :key="post.post_id" :title="'置顶原因：'+post.describe">
               <el-col :span="19">
-                <div class="post-title">
-                  <span class="title-text" @click="gotoPost(post)">
-                    {{ post.post_name }}
-                  </span>
+                <div class="post-title" @click="gotoPost(post)">
+                  {{ post.post_name }}
                 </div>
                 <div v-text="post.post_txt" class="post-content"></div>
                 <div v-show="post.img_id">
@@ -48,7 +46,9 @@
             <b>热门帖子</b>
           </template>
           <div class="topic-item" v-for="(post,idx) in hotPostList" :key="post.post_id">
-            <span class="topic-flag" :class="{'topic-flag-hot':idx<3}">{{ idx + 1 }}</span>
+            <div class="topic-flag-box">
+              <span class="topic-flag" :class="{'topic-flag-hot':idx<3}">{{ idx + 1 }}</span>
+            </div>
             <span class="topic-title" @click="gotoPost(post)">{{ post.post_name }}</span>
           </div>
         </el-card>
@@ -64,6 +64,7 @@ import {getHotPosts, getPostByPid, getTopPost} from "@/api/post.js"
 import {useRouter} from "vue-router"
 import {getUserByUid} from "@/api/user.js"
 
+console.log(store.state.ownId)
 const router = useRouter()
 const uid = store.state.ownId
 const avatar = store.state.userMap.get(uid).avatar
@@ -150,20 +151,25 @@ onActivated(() => {
 <style scoped>
 .top-body {
   height: 300px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .post-title {
-  display: block;
-  width: 70%;
+  width: 96%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  color: #222222;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.post-title:hover {
+  color: #ff0000;
 }
 
 .post-content {
-  display: block;
-  width: 90%;
+  width: 96%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -202,15 +208,18 @@ onActivated(() => {
   margin: 8px 0;
 }
 
-
-.topic-flag {
+.topic-flag-box {
   box-sizing: border-box;
   display: inline-block;
-  width: 16px;
-  background: #e3e3e3;
+  width: 18px;
   text-align: center;
-  font-size: 12px;
   margin-right: 7px;
+}
+
+.topic-flag {
+  background: #e3e3e3;
+  font-size: 12px;
+  padding: 0 4px;
 }
 
 .topic-flag-hot {

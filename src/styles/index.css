@@ -1,4 +1,6 @@
 body {
+  width: 100vw;
+  height: 100vh;
   background-color: #ecf5ff;
   margin: 0;
 }
@@ -87,6 +89,18 @@ body {
   width: 95%;
 }
 
+.message-text {
+  cursor: pointer;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.message-text:hover {
+  color: #ff0000;
+}
+
 .unread-icon {
   width: 0;
   height: 0;
@@ -107,16 +121,6 @@ body {
 }
 
 /*字体颜色*/
-
-.title-text {
-  color: #222222;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-.title-text:hover {
-  color: #ff0000;
-}
 
 .sender-text {
   color: #999999;

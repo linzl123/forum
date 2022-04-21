@@ -11,10 +11,8 @@
       <template v-if="msgList.length">
         <el-row v-for="comment in msgList" :key="comment.comment_id">
           <el-col :span="17">
-            <div class="message-content">
-              <div class="unread-icon" v-if="comment.is_unread" @click="removeUnread(comment)"></div>
-              <span class="comment-text" @click="goto(comment)">{{ comment.comment_txt }}</span>
-            </div>
+            <div class="unread-icon" v-if="comment.is_unread" @click="removeUnread(comment)"></div>
+            <span class="message-text" @click="goto(comment)">{{ comment.comment_txt }}</span>
           </el-col>
           <el-col :span="5">
             <span class="sender-text" @click="router.push('/profile/'+comment.comment_u_id)">
@@ -141,11 +139,4 @@ getMessage()
 </script>
 
 <style scoped>
-.comment-text {
-  cursor: pointer;
-}
-
-.comment-text:hover {
-  color: #ff0000;
-}
 </style>

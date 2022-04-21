@@ -17,7 +17,7 @@
                 <el-avatar :src="store.state.userMap.get(Number(uid)).avatar" class="user-avatar"></el-avatar>
                 <div>
                   <div>{{ store.state.userMap.get(Number(uid)).nickname }}</div>
-                  <div class="last-txt">{{ msgList[uid].slice(-1)[0].chat_txt }}</div>
+                  <div class="latest-txt">{{ msgList[uid].slice(-1)[0].chat_txt }}</div>
                 </div>
                 <div class="close" @click.stop="delMessage(uid)">✖</div>
               </el-row>
@@ -41,7 +41,7 @@
 
 <script setup>
 import {deleteMessage, getLetterByUid, getLetterMessage, readMessage} from "@/api/message.js"
-import {computed, nextTick, ref, watch, watchEffect} from "vue"
+import {computed, ref} from "vue"
 import {useRouter} from "vue-router"
 import store from "@/store"
 import {getUserByUid} from "@/api/user.js"
@@ -189,7 +189,7 @@ getMessage().then((ret) => {
   margin-right: 8px;
 }
 
-.last-txt {
+.latest-txt {
   width: 130px;
   color: #999999;
   font-size: 12px;

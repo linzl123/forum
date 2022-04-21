@@ -73,7 +73,7 @@ import {debounce} from "@/utils/debounce.js"
 import {createReply, deleteReplyByRid} from "@/api/reply.js"
 import store from "@/store"
 import {getUserByUid, getUserIdByNickname} from "@/api/user.js"
-import {validateAtInput} from "@/utils/validate.js"
+import {checkNickname} from "@/utils/validate.js"
 
 const props = defineProps({
   replies: {
@@ -190,7 +190,7 @@ const atInput = ref("")
 const atList = ref([])
 const handleAtInput = async () => {
   if (atInput.value === "") return
-  if (validateAtInput(atInput.value)) {
+  if (checkNickname(atInput.value)) {
     if (store.state.userMap.get(store.state.ownId).nickname === atInput.value) {
       store.commit("alert", {message: "禁止自娱自乐", type: "warning"})
     } else if (atList.value.findIndex((at) => at[1] === atInput.value) > -1) {

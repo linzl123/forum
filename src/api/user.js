@@ -9,11 +9,25 @@ export function login(u_name, u_password) {
   })
 }
 
-export function register(u_name, u_password, u_nickname) {
+export function register(u_name, u_password, u_nickname, password_question, password_answer) {
   return request.post("/register", {
     u_name,
     u_password,
     u_nickname,
+    password_question,
+    password_answer,
+  })
+}
+
+export function fetchPasswordQuestion(u_name) {
+  return request.get("/password-question/" + u_name)
+}
+
+export function fetchResetPassword(u_name, u_password, password_answer) {
+  return request.post("/reset-password", {
+    u_name,
+    u_password,
+    password_answer,
   })
 }
 

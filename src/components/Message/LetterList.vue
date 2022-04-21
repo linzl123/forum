@@ -53,8 +53,7 @@
         <span v-show="imgName!==''" class="delete-image" @click="remove">✖</span>
       </div>
       <div>
-        <el-input type="textarea" v-model="content" :rows="5"
-                  @keyup.ctrl.enter.exact="send" class="send-input"/>
+        <el-input type="textarea" v-model="content" :rows="5" @keyup.ctrl.enter.exact="send" class="send-input"/>
       </div>
       <div class="send-btn-box">
         <el-button color="#1389BF" @click="send" class="send-btn" :loading="sendLoading">
@@ -168,7 +167,6 @@ const callback = (entries, observer) => {
       let lid = Number(entry.target.id.slice(1))
       let idx = props.unreadLetters.indexOf(lid)
       if (idx !== -1) {
-        // props.unreadLetters.splice(idx, 1)
         emits("rmUnread", lid)
       }
     }
@@ -256,9 +254,9 @@ onUnmounted(() => {
 }
 
 .dialog-list {
-  height: 64%;
+  height: 63%;
   padding: 8px 8px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .dialog-item {

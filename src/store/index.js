@@ -6,6 +6,7 @@ export default createStore({
     alert: null,
     userMap: new Map(),
     ownId: 0,
+    ownName: "",
     ownSilence: "",
     ownFavorite: [],
     ownSubscribe: [],
@@ -44,6 +45,9 @@ export default createStore({
     },
     setOwnId(state, uid) {
       state.ownId = uid
+    },
+    setOwnName(state, uname) {
+      state.ownName = uname
     },
     setOwnSilence(state, silence) {
       state.ownSilence = silence

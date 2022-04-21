@@ -12,7 +12,7 @@
         <el-row v-for="at in msgList" :key="at.at_id">
           <el-col :span="17">
             <div class="unread-icon" v-if="at.is_unread" @click="removeUnread(at)"></div>
-            <span class="at-text message-content" @click="goto(at)">{{ at.message_txt }}</span>
+            <span class="message-text" @click="goto(at)">{{ at.message_txt }}</span>
           </el-col>
           <el-col :span="5">
             <span class="sender-text" @click="router.push('/profile/'+at.caller_u_id)">{{ at.nickname }}</span>
@@ -153,11 +153,4 @@ getMessage()
 </script>
 
 <style scoped>
-.at-text {
-  cursor: pointer;
-}
-
-.at-text:hover {
-  color: #ff0000;
-}
 </style>

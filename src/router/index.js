@@ -83,19 +83,6 @@ const routes = [
           },
 
         ],
-        // children: [
-        // {
-        //   path: "",
-        //   components: {
-        //     Post: () => import("@/components/Profile/Post.vue"),
-        //     Favorite: () => import("@/components/Profile/Favorite.vue"),
-        //     Comment: () => import("@/components/Profile/Comment.vue"),
-        //     Reply: () => import("@/components/Profile/Reply.vue"),
-        //     Subscribe: () => import("@/components/Profile/Subscribe.vue"),
-        //     Setting: () => import("@/components/Profile/Setting.vue"),
-        //   },
-        // },
-        // ],
       },
     ],
   },
@@ -111,10 +98,10 @@ const routes = [
     path: "/404",
     component: () => import("@/views/404.vue"),
   },
-  // {
-  //   path: "/:pathMatch(.*)*",
-  //   redirect: "/404",
-  // },
+  {
+    path: "/:pathMatch(.*)*",
+    redirect: "/404",
+  },
 ]
 
 const router = createRouter({
@@ -130,6 +117,7 @@ router.beforeEach(async (to, from, next) => {
     if (res.state === 100) {
       await getUserByUid(res.my_user_id)
       store.commit("setOwnId", res.my_user_id)
+      store.commit("setOwnName", res.my_u_name)
       store.commit("setOwnSilence", res.disable_send_msg_time)
       store.commit("setMessage", [1, res.unread_comment_number])
       store.commit("setMessage", [2, res.unread_reply_number])

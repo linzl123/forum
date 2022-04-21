@@ -4,10 +4,8 @@
     <template v-if="postIds.length">
       <el-row v-for="post in posts[idx]" :key="post.post_id">
         <el-col :span="20">
-          <div class="post-title">
-            <span class="title-text" @click="goto(post)">
-              {{ post.post_name }}
-            </span>
+          <div class="post-title" @click="goto(post)">
+            {{ post.post_name }}
           </div>
           <div v-text="post.post_txt" class="post-content"></div>
           <div v-show="post.img_id">
@@ -119,16 +117,21 @@ watch(activePage, async (newValue, oldValue) => {
 
 <style scoped>
 .post-title {
-  display: block;
-  width: 60%;
+  width: 96%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  color: #222222;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.post-title:hover {
+  color: #ff0000;
 }
 
 .post-content {
-  display: block;
-  width: 90%;
+  width: 96%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

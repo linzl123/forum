@@ -118,7 +118,7 @@ if (!self) {
 } else {
   nickname.value = store.state.userMap.get(curUid).nickname
   avatarSrc.value = store.state.userMap.get(curUid).avatar
-  username = localStorage.getItem("uname")
+  username = store.state.ownName
 }
 //
 const beforeAvatarUpload = (file) => {
