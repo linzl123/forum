@@ -15,9 +15,7 @@
           </el-button>
           <div class="forget-register">
             <span class="forget-register-item" @click="changePwd">忘记密码</span>
-            <span class="forget-register-item" @click="router.push('/register')">
-            新用户
-          </span>
+            <span class="forget-register-item" @click="router.push('/register')">新用户</span>
           </div>
         </el-form>
       </div>
@@ -29,11 +27,11 @@
 </template>
 
 <script setup>
-import {computed, onMounted, reactive, ref} from "vue"
+import {onMounted, reactive, ref} from "vue"
 import {useRoute, useRouter} from "vue-router"
 import {fetchPasswordQuestion, login} from "@/api/user"
 import store from "@/store"
-import {validatePassword, validateUsername, checkNickname} from "@/utils/validate"
+import {checkNickname, validatePassword, validateUsername} from "@/utils/validate"
 import ModifyPassword from "@/components/ModifyPassword.vue"
 
 const router = useRouter()

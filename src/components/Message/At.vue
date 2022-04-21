@@ -34,7 +34,7 @@
 
 <script setup>
 import {deleteMessage, getAtMessage, readMessage} from "@/api/message.js"
-import {ref, watch} from "vue"
+import {ref} from "vue"
 import {useRouter} from "vue-router"
 import store from "@/store"
 import {getUserByUid} from "@/api/user.js"

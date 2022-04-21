@@ -78,7 +78,7 @@ import {deleteCommentByCid} from "@/api/comment.js"
 import ReplyDetail from "@/components/ReplyDetail.vue"
 import store from "@/store"
 import {debounce} from "@/utils/debounce.js"
-import {setCommentAgree, setPostAgree} from "@/api/agree.js"
+import {setCommentAgree} from "@/api/agree.js"
 
 const props = defineProps({
   comment: {

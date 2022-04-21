@@ -32,11 +32,10 @@
 </template>
 
 <script setup>
-import {reactive, ref} from "vue"
-import {fetchPasswordQuestion, fetchResetPassword, getPrivacySetting, setPrivacySetting} from "@/api/user.js"
+import {ref} from "vue"
+import {fetchPasswordQuestion, getPrivacySetting, setPrivacySetting} from "@/api/user.js"
 import store from "@/store"
 import ModifyPassword from "@/components/ModifyPassword.vue"
-import {validatePassword} from "@/utils/validate.js"
 
 // 隐私
 const privacyList = [

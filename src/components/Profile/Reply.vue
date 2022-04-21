@@ -48,7 +48,6 @@ import {chunk} from "@/utils/array.js"
 import store from "@/store"
 import {deleteReplyByRid, getReplyByRid, getReplyByUid} from "@/api/reply.js"
 import {debounce} from "@/utils/debounce.js"
-import {getCommentByCid} from "@/api/comment.js"
 
 const route = useRoute()
 const router = useRouter()

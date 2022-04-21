@@ -3,9 +3,8 @@
 </template>
 
 <script setup>
-import {isReactive, isRef, ref, toRefs} from "vue"
+import {ref} from "vue"
 import {useRoute} from "vue-router"
-import {debounce} from "@/utils/debounce.js"
 import store from "@/store"
 import {deletePostByPid} from "@/api/post.js"
 
