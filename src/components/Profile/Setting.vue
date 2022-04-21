@@ -17,7 +17,8 @@
       <el-button @click="changePwd" :loading="changePwdLoading">修改密码</el-button>
     </div>
   </div>
-  <modify-password :pwd-dialog="pwdDialog" :question="question" @close="pwdDialog=false"></modify-password>
+  <modify-password :pwd-dialog="pwdDialog" :question="question"
+                   :uname="uname" @close="pwdDialog=false"></modify-password>
   <el-divider></el-divider>
   <div>
     <h4>隐私设置</h4>
@@ -58,8 +59,8 @@ const toggle = async (privacySwitch, idx) => {
 }
 // 个人资料
 const uid = store.state.ownId
-const nickname = store.state.userMap.get(uid).nickname
 const uname = store.state.ownName
+const nickname = store.state.userMap.get(uid).nickname
 const avatar = store.state.userMap.get(uid).avatar
 const inputNickname = ref(nickname)
 

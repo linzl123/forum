@@ -22,7 +22,9 @@
         </el-form>
       </div>
     </div>
-    <modify-password :pwd-dialog="pwdDialog" :question="question" @close="pwdDialog=false"></modify-password>
+    <modify-password :pwd-dialog="pwdDialog" :question="question"
+                     :uname="loginForm.username" @close="pwdDialog=false">
+    </modify-password>
   </div>
 </template>
 

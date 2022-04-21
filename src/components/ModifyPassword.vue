@@ -39,9 +39,12 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  uname: {
+    type: String,
+    required: true,
+  },
 })
 const emits = defineEmits(["close"])
-const uname = store.state.ownName
 const pwdFormRef = ref()
 const pwdForm = reactive({
   answer: "",
@@ -67,7 +70,7 @@ const savePwd = async () => {
   savePwdLoading.value = true
   pwdFormRef.value.validate(async (success) => {
     if (success) {
-      let res = await fetchResetPassword(uname, pwdForm.newPwd, pwdForm.answer)
+      let res = await fetchResetPassword(props.uname, pwdForm.newPwd, pwdForm.answer)
       if (res.state === 100) {
         emits("close")
         store.commit("alert", {message: "修改密码成功", type: "success"})
