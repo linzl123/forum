@@ -302,7 +302,9 @@ const toSendComment = ref(false)
 const refresh = debounce(() => {
   activePage = -1
   commentsList.value = []
-  getComments()
+  getComments().then(() => {
+    store.commit("alert", {message: "刷新成功", type: "success"})
+  })
 })
 // 回到顶部
 const gotoTop = () => {

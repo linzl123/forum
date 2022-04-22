@@ -57,11 +57,12 @@
 import PostList from "@/components/PostList.vue"
 import {useRoute, useRouter} from "vue-router"
 import SendPost from "@/components/SendPost.vue"
-import {provide, ref} from "vue"
+import {ref} from "vue"
 import {getAllPostsByZone, getHotPosts} from "@/api/post.js"
 import {POST_PER_PAGE} from "@/config/constVal.js"
 import {chunk} from "@/utils/array.js"
 import {debounce} from "@/utils/debounce.js"
+import store from "@/store"
 
 const zoneList = [
   {
@@ -119,6 +120,7 @@ const refreshLoading = ref(false)
 const refresh = debounce(() => {
   refreshLoading.value = true
   getPostIds().then(() => {
+    store.commit("alert", {message: "刷新成功", type: "success"})
     refreshLoading.value = false
   })
 })
