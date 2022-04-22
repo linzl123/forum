@@ -185,14 +185,14 @@ body {
   margin-left: 450px;
 }
 
-.tool-sidebar-item {
+.tool-sidebar-icon {
   width: 32px;
   height: 32px;
   cursor: pointer;
   background-color: #ffffff;
-  padding: 5px;
+  padding: 8px;
 }
 
-.tool-sidebar-item:hover > path {
+.tool-sidebar-icon:hover > path {
   fill: #1296db;
 }

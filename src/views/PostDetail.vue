@@ -100,7 +100,7 @@
 
     <ul class="tool-sidebar">
       <li @click="toSendComment=true" title="评论">
-        <svg class="tool-sidebar-item" viewBox="0 0 1024 1024"
+        <svg class="tool-sidebar-icon" viewBox="0 0 1024 1024"
              xmlns="http://www.w3.org/2000/svg"
              width="32" height="32">
           <path
@@ -109,7 +109,7 @@
         </svg>
       </li>
       <li @click="refresh" title="刷新">
-        <svg class="tool-sidebar-item" viewBox="0 0 1024 1024"
+        <svg class="tool-sidebar-icon" viewBox="0 0 1024 1024"
              xmlns="http://www.w3.org/2000/svg"
              width="32" height="32">
           <path
@@ -118,7 +118,7 @@
         </svg>
       </li>
       <li @click="gotoTop" title="回到顶部">
-        <svg class="tool-sidebar-item" viewBox="0 0 1024 1024"
+        <svg class="tool-sidebar-icon" viewBox="0 0 1024 1024"
              xmlns="http://www.w3.org/2000/svg"
              width="32" height="32">
           <path
