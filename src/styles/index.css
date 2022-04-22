@@ -174,3 +174,25 @@ body {
   text-align: center;
   color: #A8ABB2;
 }
+
+/*右侧便工具栏*/
+
+.tool-sidebar {
+  position: fixed;
+  left: 50%;
+  top: 45%;
+  list-style: none;
+  margin-left: 450px;
+}
+
+.tool-sidebar-item {
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  background-color: #ffffff;
+  padding: 5px;
+}
+
+.tool-sidebar-item:hover > path {
+  fill: #1296db;
+}
