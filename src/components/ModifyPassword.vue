@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="pwdDialog" width="500px" @close="closePwdDialog">
+  <el-dialog v-model="dialog" width="500px" @close="closePwdDialog">
     <template #title>
       <strong>修改密码</strong>
     </template>
@@ -31,10 +31,6 @@ import {fetchResetPassword} from "@/api/user.js"
 import store from "@/store"
 
 const props = defineProps({
-  pwdDialog: {
-    type: Boolean,
-    required: true,
-  },
   question: {
     type: String,
     required: true,
@@ -45,6 +41,7 @@ const props = defineProps({
   },
 })
 const emits = defineEmits(["close"])
+const dialog = ref(true)
 const pwdFormRef = ref()
 const pwdForm = reactive({
   answer: "",

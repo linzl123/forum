@@ -4,7 +4,7 @@
       <add-picture :remove="remove" @uploadImg="uploadImg" @removeImg="removeImg"></add-picture>
     </div>
     <div class="at-list">
-      <el-tag v-for="at in atList" :key="at[0]" class="at-tag"
+      <el-tag v-for="at in atList" :key="'a'+at[0]" class="at-tag"
               type="success" closable @close="removeAt(at)">
         @{{ at[1] }}
       </el-tag>
@@ -52,7 +52,7 @@ const props = defineProps({
 )
 const emits = defineEmits(["sendSuccess"])
 const content = ref("")
-const router=useRouter()
+const router = useRouter()
 //引用
 const inputRef = ref()
 defineExpose({inputRef})
@@ -172,5 +172,9 @@ const send = async () => {
 .send-btn {
   display: flex;
   justify-content: end;
+}
+
+.at-input >>> .el-input__inner {
+  padding-left: 24px !important;
 }
 </style>

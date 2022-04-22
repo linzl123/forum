@@ -13,7 +13,7 @@
               {{ reply.sender }}
             </span>
             :
-            <span v-for="(nickname,uid) in reply.someone_be_at" :key="uid">
+            <span v-for="(nickname,uid) in reply.someone_be_at" :key="'ra'+uid">
               @<span class="user-nickname" @click="router.push('/profile/'+uid)">{{ nickname }}</span>
             </span>
             <span>

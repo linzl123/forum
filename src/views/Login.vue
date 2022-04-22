@@ -20,9 +20,9 @@
         </el-form>
       </div>
     </div>
-    <modify-password :pwd-dialog="pwdDialog" :question="question"
-                     :uname="loginForm.username" @close="pwdDialog=false">
-    </modify-password>
+    <div v-if="pwdDialog">
+      <modify-password :question="question" :uname="loginForm.username" @close="pwdDialog = false"></modify-password>
+    </div>
   </div>
 </template>
 
@@ -43,7 +43,7 @@ const loginForm = reactive({
   username: "123",
   password: "123",
 })
-const accountInput = ref() //帐号框
+const accountInput = ref()
 const route = useRoute()
 
 const formRef = ref()

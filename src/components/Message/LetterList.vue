@@ -57,7 +57,7 @@
       </div>
       <div class="send-btn-box">
         <el-button color="#1389BF" @click="send" class="send-btn" :loading="sendLoading">
-          发送
+          发送 / Ctrl+Entry
         </el-button>
       </div>
     </div>
@@ -192,8 +192,6 @@ nextTick(() => {
   // 触底监听
   let dialogListDom = document.querySelector(".dialog-list")
   dialogListDom.addEventListener("scroll", () => {
-    // console.log(parseInt(window.getComputedStyle(dialogListDom).height) + dialogListDom.scrollTop)
-    // console.log(dialogListDom.scrollHeight)
     if (parseInt(window.getComputedStyle(dialogListDom).height) + dialogListDom.scrollTop + 18 >= dialogListDom.scrollHeight) {
       reachBottom = true
       hasNewMsg.value = false

@@ -19,7 +19,7 @@
           </el-card>
         </el-col>
         <el-col :span="19">
-          <el-card shadow="never">
+          <el-card shadow="never" class="right-record">
             <template #header>
               <ul class="profile-list">
                 <li class="profile-list-item" v-for="item in profileList" :key="item[1]"
@@ -33,7 +33,9 @@
                 </li>
               </ul>
             </template>
-            <router-view></router-view>
+            <div class="record-list">
+              <router-view></router-view>
+            </div>
           </el-card>
         </el-col>
       </el-row>
@@ -57,7 +59,7 @@
             </el-card>
           </el-col>
           <el-col :span="19">
-            <el-card shadow="never">
+            <el-card shadow="never" class="right-record">
               <template #header>
                 <ul class="profile-list">
                   <li class="profile-list-item" v-for="item in profileList" :key="item[1]"
@@ -67,7 +69,9 @@
                   </li>
                 </ul>
               </template>
-              <router-view></router-view>
+              <div class="record-list">
+                <router-view></router-view>
+              </div>
             </el-card>
           </el-col>
         </el-row>
@@ -172,14 +176,18 @@ const sendLetter = async () => {
   justify-content: center;
 }
 
+.right-record {
+  height: 86vh;
+}
+
 .profile-list {
-  display: flex;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
 .profile-list-item {
+  display: inline-block;
   margin: 0 1rem;
   cursor: pointer;
 }
@@ -188,8 +196,12 @@ const sendLetter = async () => {
   color: #2faee3;
 }
 
+.record-list {
+  height: 74vh;
+  overflow-y: auto;
+}
+
 .active {
   color: #2faee3;
 }
-
 </style>

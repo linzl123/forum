@@ -1,8 +1,7 @@
 <template>
-  <div v-loading="isLoading" style="min-height: 40px"></div>
-  <div v-if="!isLoading" style="margin-top: -40px">
-    <template v-if="postIds.length">
-      <el-row v-for="post in posts[idx]" :key="post.post_id">
+  <div>
+    <div v-for="(posts,idx) in postsList" :key="idx" class="post-item">
+      <el-row v-for="post in posts" :key="post.post_id">
         <el-col :span="20">
           <div class="post-title" @click="goto(post)">
             {{ post.post_name }}
@@ -17,23 +16,18 @@
         </el-col>
         <el-divider></el-divider>
       </el-row>
-      <el-pagination v-show="!isLoading" v-model:current-page="activePage" layout="prev,pager,next"
-                     :page-size="POST_PER_PAGE" :page-count="postIds.length">
-      </el-pagination>
-    </template>
-    <div v-else>
-      <el-empty :description="description"></el-empty>
     </div>
+    <div v-if="noData" class="no-data">{{ description }}</div>
+    <div v-loading="isLoading" style="margin-top: 18px"></div>
   </div>
 </template>
 
 <script setup>
-import {ref, toRefs, watch} from "vue"
+import {nextTick, ref, toRefs, watch} from "vue"
 import {useRouter} from "vue-router"
 import {getUserByUid} from "@/api/user"
 import {getPostsByPids} from "@/api/post"
 import {getImg} from "@/api/image"
-import {MAX_CACHED, POST_PER_PAGE} from "@/config/constVal"
 import store from "@/store"
 
 const props = defineProps({
@@ -41,78 +35,120 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  origin: {
+    type: String,
+    required: true,
+  },
   description: {
     type: String,
+    required: true,
   },
 })
-const router = useRouter()
-const {postIds} = toRefs(props)
-const activePage = ref(1)
-const activePageIds = ref([])
-const posts = ref([])
+// 获取帖子
+const postsList = ref([])
+let activePage = -1, activePageIds = null
+let resPosts = null
 const isLoading = ref(true)
-
-const goto = (post) => {
-  post.exist ?
-    router.push("/post/" + post.post_id)
-    : store.commit("alert", {message: "帖子已被删除", type: "info"})
-}
-
-let cached = []
-watch(postIds, (newValue) => {
-  if (newValue.length === 0) {
-    isLoading.value = false
-  } else {
-    cached = []
-    posts.value = []
-    activePage.value = -1
-  }
-})
-const idx = ref()
-watch(activePage, async (newValue, oldValue) => {
-  if (newValue === -1) {
-    activePage.value = oldValue
-    return
-  }
-  idx.value = cached.indexOf(activePage.value)
-  if (idx.value !== -1) {
-    isLoading.value = false
-    return
-  }
+const noData = ref(false)
+const getPosts = async () => {
   isLoading.value = true
-  activePageIds.value = postIds.value[activePage.value - 1]
-  let reqUsers = Array(activePageIds.value.length)
-  let resPosts = await getPostsByPids(activePageIds.value)
-  resPosts = resPosts.posts
-  let existPostIds = Array(activePageIds.value.length).fill(0)
-  resPosts.forEach((v, i) => {
-    v.post_time = v.post_time.slice(0, 10) + " " + v.post_time.slice(11, 16)
-    v.img_id = getImg(v.img_id)
-    v.exist = true
-    reqUsers[i] = getUserByUid(v.u_id)
-    existPostIds[i] = [v.post_id, i]
-  })
-  let resUsers = await Promise.all(reqUsers)
-  resPosts.forEach((v, i) => {
-    v.sender = resUsers[i].nickname
-  })
-  let tmpPosts = Array(activePageIds.value.length)
-  existPostIds.forEach((v, i) => {
-    if (v[0] > 0) {
-      tmpPosts[i] = resPosts[v[1]]
-    } else {
-      tmpPosts[i] = {post_txt: "该帖子不存在", post_id: activePageIds.value[i], exist: false}
-    }
-  })
-  if (cached.length > MAX_CACHED) {
-    cached.shift()
-    posts.value.shift()
+  activePageIds = props.postIds[++activePage]
+  if (activePageIds == null) {
+    isLoading.value = false
+    noData.value = true
+    return
   }
-  cached.push(activePage.value)
-  posts.value.push(tmpPosts)
-  idx.value = cached.length - 1
+  while (1) {
+    try {
+      resPosts = await getPostsByPids(activePageIds)
+      if (resPosts.state === 100) {
+        resPosts = resPosts.posts
+        //处理帖子
+        switch (props.origin) {
+          //分区帖子
+          case "ZonePost":
+            let reqUsers = Array(activePageIds.length)
+            resPosts.forEach((v, i) => {
+              v.post_time = v.post_time.slice(0, 10) + " " + v.post_time.slice(11, 16)
+              v.img_id = getImg(v.img_id)
+              reqUsers[i] = getUserByUid(v.u_id)
+            })
+            let resUsers = await Promise.all(reqUsers)
+            resPosts.forEach((v, i) => {
+              v.sender = resUsers[i].nickname
+            })
+            break
+          //用户资料帖子
+          case "ProfilePost":
+            resPosts.forEach((v, i) => {
+              v.post_time = v.post_time.slice(0, 10) + " " + v.post_time.slice(11, 16)
+              v.img_id = getImg(v.img_id)
+              v.exist = true
+            })
+            break
+          //用户资料收藏
+          case "ProfileFavorite":
+            let existPostIds = Array(activePageIds.length).fill(0)
+            resPosts.forEach((v, i) => {
+              v.post_time = v.post_time.slice(0, 10) + " " + v.post_time.slice(11, 16)
+              v.img_id = getImg(v.img_id)
+              existPostIds[i] = [v.post_id, i]
+            })
+            let tmpPosts = Array(activePageIds.length)
+            existPostIds.forEach((v, i) => {
+              if (v[0] > 0) tmpPosts[i] = resPosts[v[1]]
+              else tmpPosts[i] = {post_txt: "帖子已被删除", post_id: activePageIds[i], exist: false}
+            })
+            resPosts = tmpPosts
+            break
+        }
+        break
+      } else {
+        store.commit("alert", {message: "未经处理的响应", type: "error"})
+      }
+    } catch (err) {
+      store.commit("alert", {message: "获取帖子失败，正在重新获取", type: "warning"})
+    }
+  }
+  postsList.value.push(resPosts)
   isLoading.value = false
+  nextTick(() => {
+    getPostsObserver.observe(elementList[elementList.length - 1])
+  })
+}
+// 进入帖子详情
+const router = useRouter()
+const goto = (post) => {
+  router.push("/post/" + post.post_id)
+}
+// 监听最后第X个元素
+const getPostsObserver = new IntersectionObserver(
+  (entries, observer) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        observer.unobserve(entry.target)
+        getPosts()
+      }
+    })
+  },
+  {
+    // root: document.querySelector(""),
+    threshold: 0,
+  },
+)
+let elementList = null
+nextTick(() => {
+  elementList = document.getElementsByClassName("post-item")
 })
+//
+const {postIds} = toRefs(props)
+watch(postIds, () => {
+  postsList.value = []
+  activePage = -1
+  activePageIds = null
+  getPosts()
+})
+const {description} = toRefs(props)
 </script>
 
 <style scoped>

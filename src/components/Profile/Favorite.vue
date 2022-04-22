@@ -1,5 +1,5 @@
 <template>
-  <post-list :post-ids="postIds" :description="description">
+  <post-list :post-ids="postIds" :description="description" origin="ProfileFavorite">
     <template v-if="store.state.ownId===Number(route.params.id)" #default="{post}">
       <favorite-handle :pid="post.post_id"></favorite-handle>
     </template>
@@ -18,7 +18,7 @@ import FavoriteHandle from "@/components/FavoriteHandle.vue"
 
 const route = useRoute()
 const postIds = ref([])
-const description = ref("啊 哦，什么都没有呢")
+const description = ref("暂无更多收藏")
 const getFavoriteIds = async () => {
   let res = await getFavoriteByUid(route.params.id)
   if (res.state === 100) {

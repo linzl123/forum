@@ -1,6 +1,4 @@
 body {
-  width: 100vw;
-  height: 100vh;
   background-color: #ecf5ff;
   margin: 0;
 }
@@ -169,4 +167,10 @@ body {
 
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
+}
+
+/**/
+.no-data {
+  text-align: center;
+  color: #A8ABB2;
 }

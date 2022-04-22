@@ -1,5 +1,7 @@
 <template>
-  <send-editor mode="comment" :pid="pid" @sendSuccess="sendSuccess" ref="sendEditorRef"></send-editor>
+  <el-dialog v-model="dialog" width="1000px" title="发送评论" @close="emits('close')">
+    <send-editor mode="comment" :pid="pid" @sendSuccess="sendSuccess"></send-editor>
+  </el-dialog>
 </template>
 
 <script setup>
@@ -12,13 +14,11 @@ const props = defineProps({
     required: true,
   },
 })
-const emits = defineEmits(["sendSuccess"])
+const emits = defineEmits(["close"])
+const dialog = ref(true)
 const sendSuccess = () => {
-  emits("sendSuccess")
+  emits("close")
 }
-
-const sendEditorRef = ref()
-defineExpose({sendEditorRef})
 </script>
 
 <style scoped>

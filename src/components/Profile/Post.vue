@@ -1,5 +1,5 @@
 <template>
-  <post-list :post-ids="postIds" :description="description">
+  <post-list :post-ids="postIds" origin="ProfilePost" :description="description">
     <template v-if="store.state.ownId===Number(route.params.id)" #default="{post}">
       <post-handle :post="post"></post-handle>
     </template>
@@ -18,7 +18,7 @@ import store from "@/store"
 
 const route = useRoute()
 const postIds = ref([])
-const description = ref("啊 哦，什么都没有呢")
+const description = ref("快去发表更多帖子吧")
 const getPostIds = async () => {
   let res = await getAllPostIdsByUid(route.params.id)
   if (res.state === 100) {

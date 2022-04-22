@@ -17,8 +17,9 @@
       <el-button @click="changePwd" :loading="changePwdLoading">修改密码</el-button>
     </div>
   </div>
-  <modify-password :pwd-dialog="pwdDialog" :question="question"
-                   :uname="uname" @close="pwdDialog=false"></modify-password>
+  <div v-if="pwdDialog">
+    <modify-password :question="question" :uname="uname" @close="pwdDialog=false"></modify-password>
+  </div>
   <el-divider></el-divider>
   <div>
     <h4>隐私设置</h4>
@@ -36,7 +37,14 @@ import {ref} from "vue"
 import {fetchPasswordQuestion, getPrivacySetting, setPrivacySetting} from "@/api/user.js"
 import store from "@/store"
 import ModifyPassword from "@/components/ModifyPassword.vue"
+import {useRoute, useRouter} from "vue-router"
 
+//
+const route = useRoute()
+const router = useRouter()
+if (Number(route.path.match(/\d+/)[0]) !== store.state.ownId) {
+  router.replace(route.path.replace(/\d+/, store.state.ownId))
+}
 // 隐私
 const privacyList = [
   "隐藏我的帖子",

@@ -7,7 +7,7 @@
             <b>置顶帖子</b>
           </template>
           <div class="top-body">
-            <el-row v-for="post in topPostList" :key="post.post_id" :title="'置顶原因：'+post.describe">
+            <el-row v-for="post in topPostList" :key="'t'+post.post_id" :title="'置顶原因：'+post.describe">
               <el-col :span="19">
                 <div class="post-title" @click="gotoPost(post)">
                   {{ post.post_name }}
@@ -45,7 +45,7 @@
           <template #header>
             <b>热门帖子</b>
           </template>
-          <div class="topic-item" v-for="(post,idx) in hotPostList" :key="post.post_id">
+          <div class="topic-item" v-for="(post,idx) in hotPostList" :key="'h'+post.post_id">
             <div class="topic-flag-box">
               <span class="topic-flag" :class="{'topic-flag-hot':idx<3}">{{ idx + 1 }}</span>
             </div>
@@ -57,6 +57,7 @@
   </div>
 </template>
 
+<script>export default {name: "Home"}</script>
 <script setup>
 import store from "@/store"
 import {onActivated, ref} from "vue"
@@ -64,7 +65,6 @@ import {getHotPosts, getPostByPid, getTopPost} from "@/api/post.js"
 import {useRouter} from "vue-router"
 import {getUserByUid} from "@/api/user.js"
 
-console.log(store.state.ownId)
 const router = useRouter()
 const uid = store.state.ownId
 const avatar = store.state.userMap.get(uid).avatar
@@ -173,6 +173,11 @@ onActivated(() => {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.post-img {
+  max-height: 80px;
+  object-fit: contain;
 }
 
 .zone-card {

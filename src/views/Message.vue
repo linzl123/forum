@@ -22,9 +22,6 @@
   </div>
 </template>
 
-<script>
-export default {name: "Message"}
-</script>
 <script setup>
 import {useRoute, useRouter} from "vue-router"
 import store from "@/store"

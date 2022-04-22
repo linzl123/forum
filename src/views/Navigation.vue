@@ -44,7 +44,7 @@
       <!--        </transition>-->
       <!--      </router-view>-->
       <router-view v-slot="{Component,route}">
-        <keep-alive exclude="PostDetail,Message">
+        <keep-alive include="Home,ZonePost">
           <component :is="Component" :key="route.path"></component>
         </keep-alive>
       </router-view>

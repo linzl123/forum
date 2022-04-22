@@ -1,6 +1,5 @@
 import axios from "axios"
 import store from "@/store"
-import {clearUserState} from "@/api/user.js"
 
 const request = axios.create({
   // baseURL: "http://101.33.218.141:15656",
@@ -8,7 +7,7 @@ const request = axios.create({
   headers: {
     "content-type": "application/json; charset=utf-8",
   },
-  timeout: 5000,
+  timeout: 10000,
   withCredentials: true, // 跨域请求是否提供凭据信息（cookie、HTTP认证及客户端SSL证明等）
 })
 
@@ -23,7 +22,8 @@ request.interceptors.response.use((res) => {
     return res.data
   }, async (err) => {
     if (err.response == null) {
-      console.log(err)
+      store.commit("alert", {message: "请求超时", type: "error"})
+      // location.reload()
     } else {
       if (err.response.status === 401) {
         return err.response.data

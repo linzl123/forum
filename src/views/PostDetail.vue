@@ -11,7 +11,7 @@
                   {{ onlyLzText }}
                 </el-button>
                 <favorite-handle :pid="Number(route.params.id)"></favorite-handle>
-                <el-button @click="toComment">评论</el-button>
+                <el-button @click="toSendComment=true">评论</el-button>
               </div>
             </div>
           </template>
@@ -28,7 +28,7 @@
             </el-col>
             <el-col :span="21">
               <div class="content-main">
-                <span v-for="(nickname,uid) in post.someone_be_at" :key="uid">
+                <span v-for="(nickname,uid) in post.someone_be_at" :key="'pa'+uid">
                   @<span class="user-nickname" @click="router.push('/profile/'+uid)">{{ nickname }}</span>
                 </span>
                 <div class="content-text">
@@ -72,21 +72,26 @@
                   </el-popconfirm>
                 </template>
                 &ensp;
-                <span class="handle-text" @click="toComment">评论</span>
+                <span class="handle-text" @click="toSendComment=true">评论</span>
               </div>
             </el-col>
           </el-row>
           <el-divider></el-divider>
           <!--    评论-->
-          <comment-detail v-for="comment in comments" :key="comment.cid" :comment="comment"
-                          :lzUid="lzUid"
-                          @getReplies="getReplies(comment)"
-                          @delComment="delComment">
-          </comment-detail>
+          <div v-for="(comments,idx) in commentsList" :key="'c'+idx">
+            <div v-for="comment in comments" :key="'cc'+comment.cid" class="comment-item">
+              <comment-detail :lz-uid="lzUid" :comment="comment"
+                              @getReplies="getReplies(comment)" @delComment="delComment">
+              </comment-detail>
+            </div>
+          </div>
+          <div v-if="noData" class="no-data">暂无更多评论</div>
           <div v-loading="commentIsLoading"></div>
         </el-card>
         <!--发送评论-->
-        <send-comment :pid="pid" ref="sendCommentRef" @sendSuccess="getComments"></send-comment>
+        <div v-if="toSendComment">
+          <send-comment :pid="pid" @close="toSendComment = false"></send-comment>
+        </div>
       </template>
       <template v-else>
         <el-empty description="啊 哦，帖子不见了"></el-empty>
@@ -95,9 +100,6 @@
   </div>
 </template>
 
-<script>
-export default {name: "PostDetail"}
-</script>
 <script setup>
 import {nextTick, ref} from "vue"
 import {useRoute, useRouter} from "vue-router"
@@ -110,33 +112,35 @@ import CommentDetail from "@/components/CommentDetail.vue"
 import SendComment from "@/components/SendComment.vue"
 import FavoriteHandle from "@/components/FavoriteHandle.vue"
 import {getCommentAgree, getPostAgree, setPostAgree} from "@/api/agree.js"
+import {chunk} from "@/utils/array.js"
+import {POST_PER_PAGE} from "@/config/constVal.js"
 
 const route = useRoute()
 const router = useRouter()
+//
 const pid = Number(route.params.id)
 const post = ref()
-const commentIds = ref()
-const comments = ref()
 const noFound = ref(true)
 const postIsLoading = ref(true)
-const commentIsLoading = ref(true)
 const lzUid = ref() // 楼主的Uid
-//
+let commentIds = []
 const getPost = async () => {
-  let res = await getPostByPid(pid)
-  if (res.state === 101) {
+  let resPost = await getPostByPid(pid)
+  if (resPost.state === 101) {
     return Promise.reject()
   }
   noFound.value = false
-  lzUid.value = res.u_id
-  res.img_id = getImg(res.img_id)
-  res.someone_be_at = JSON.parse(res.someone_be_at)
-  res.post_time = res.post_time.slice(0, 10) + " " + res.post_time.slice(11, 16)
-  let reqUser = getUserByUid(res.u_id)
+  lzUid.value = resPost.u_id
+  resPost.img_id = getImg(resPost.img_id)
+  resPost.someone_be_at = JSON.parse(resPost.someone_be_at)
+  resPost.post_time = resPost.post_time.slice(0, 10) + " " + resPost.post_time.slice(11, 16)
+  let reqUser = getUserByUid(resPost.u_id)
   let reqAgree = getPostAgree(pid)
-  let [resUser, resAgree] = await Promise.all([reqUser, reqAgree])
-  res.sender = resUser.nickname
-  res.avatar = resUser.avatar
+  let reqCommentIds = getAllCommentIdsByPid(pid)
+  let [resUser, resAgree, resCommentIds] = await Promise.all([reqUser, reqAgree, reqCommentIds])
+  resPost.sender = resUser.nickname
+  resPost.avatar = resUser.avatar
+  if (resCommentIds.comment_ids) commentIds = chunk(resCommentIds.comment_ids, POST_PER_PAGE)
   let agreeCnt = 0, disagreeCnt = 0
   for (let [k, v] of Object.entries(resAgree.vote_message)) {
     v === true ? agreeCnt++ : disagreeCnt++
@@ -145,28 +149,34 @@ const getPost = async () => {
       else disagreeColor.value = ENSURE_COLOR
     }
   }
-  res.agreeCnt = agreeCnt
-  res.disagreeCnt = disagreeCnt
-  post.value = res
+  resPost.agreeCnt = agreeCnt
+  resPost.disagreeCnt = disagreeCnt
+  post.value = resPost
 }
+const commentsList = ref([])
+let activePage = -1, activePageIds = null
+const commentIsLoading = ref(true)
+const noData = ref(false)
+let getCommentsLock = false
 const getComments = async () => {
+  if (getCommentsLock) return
+  getCommentsLock = true
   commentIsLoading.value = true
-  let res = await getAllCommentIdsByPid(pid)
-  if (res.comment_ids !== null) {
-    commentIds.value = res.comment_ids
-  } else {
+  activePageIds = commentIds[++activePage]
+  if (activePageIds == null) {
     commentIsLoading.value = false
+    noData.value = true
     return
   }
-  let reqComment = Array(commentIds.value.length)
-  commentIds.value.forEach((v, i) => {
-    reqComment[i] = getCommentWithRepliesByCid(v)
+  let reqComments = Array(activePageIds.length)
+  activePageIds.forEach((v, i) => {
+    reqComments[i] = getCommentWithRepliesByCid(v)
   })
-  let resComment = await Promise.all(reqComment)
-  let reqUser = Array(commentIds.value.length)
-  let reqAgree = Array(commentIds.value.length)
-  resComment.forEach((v, i) => {
-    v.cid = commentIds.value[i]
+  let resComments = await Promise.all(reqComments)
+  let reqUser = Array(activePageIds.length)
+  let reqAgree = Array(activePageIds.length)
+  resComments.forEach((v, i) => {
+    v.cid = activePageIds[i]
     v.comment_time = v.comment_time.slice(0, 10) + " " + v.comment_time.slice(11, 16)
     v.img_id = getImg(v.img_id)
     v.someone_be_at = JSON.parse(v.someone_be_at)
@@ -176,37 +186,87 @@ const getComments = async () => {
   })
   let resUser = await Promise.all(reqUser)
   let resAgree = await Promise.all(reqAgree)
-  resComment.forEach((v, i) => {
+  resComments.forEach((v, i) => {
     v.sender = resUser[i].nickname
     v.avatar = resUser[i].avatar
     v.isVote = 0
     v.agreeCnt = 0
     v.disagreeCnt = 0
   })
-  comments.value = resComment
-  commentIsLoading.value = false
   resAgree.forEach((v, i) => {
     let agreeCnt = 0, disagreeCnt = 0
     for (let [key, value] of Object.entries(v.vote_message)) {
       value === true ? agreeCnt++ : disagreeCnt++
       if (Number(key) === store.state.ownId) {
-        if (value) comments.value[i].isVote = 1
-        else comments.value[i].isVote = -1
+        if (value) resComments[i].isVote = 1
+        else resComments[i].isVote = -1
       }
     }
-    comments.value[i].agreeCnt = agreeCnt
-    comments.value[i].disagreeCnt = disagreeCnt
+    resComments[i].agreeCnt = agreeCnt
+    resComments[i].disagreeCnt = disagreeCnt
   })
+  commentsList.value.push(resComments)
+  commentIsLoading.value = false
+  nextTick(() => {
+    getPostsObserver.observe(elementList[elementList.length - (Math.ceil(POST_PER_PAGE / 2))])
+  })
+  getCommentsLock = false
 }
 const getReplies = async (comment) => {
   let res = await getCommentWithRepliesByCid(comment.cid)
   comment.replies = res.replies
 }
-//
-const sendCommentRef = ref()
-const toComment = () => {
-  sendCommentRef.value.sendEditorRef.inputRef.focus()
-}
+getPost().then(() => {
+  postIsLoading.value = false
+  getComments().then(() => {
+    nextTick(async () => {
+      if (store.state.gotoElement) {
+        let elementLocation = null, noFind = true
+        while (!noData.value) {
+          elementLocation = document.querySelector(store.state.gotoElement)
+          if (elementLocation) {
+            elementLocation.scrollIntoView({behavior: "auto", block: "center"})
+            let color = elementLocation.style.background
+            elementLocation.style.background = "#faecd8"
+            setTimeout(() => {
+              elementLocation.style.background = color
+            }, 1000)
+            noFind = false
+            break
+          } else {
+            await getComments()
+          }
+        }
+        if (noFind) {
+          store.commit("alert", {message: "已被删除", type: "warning"})
+        }
+        store.commit("setGotoElement", "")
+      }
+    })
+  })
+}).catch(() => {
+  postIsLoading.value = false
+})
+//监听元素，重新获取数据
+const getPostsObserver = new IntersectionObserver(
+  (entries, observer) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        observer.unobserve(entry.target)
+        getComments()
+      }
+    })
+  },
+  {
+    threshold: 0,
+  },
+)
+let elementList = null
+nextTick(() => {
+  elementList = document.getElementsByClassName("comment-item")
+})
+// 发表评论
+const toSendComment = ref(false)
 //删除
 const deletePost = async () => {
   let message, type
@@ -284,30 +344,6 @@ const disagree = async () => {
   }
   voteLoading.value = false
 }
-//create
-getPost().then(() => {
-  postIsLoading.value = false
-  getComments().then(() => {
-    nextTick(() => {
-      if (store.state.gotoElement) {
-        let elementLocation = document.querySelector(store.state.gotoElement)
-        if (elementLocation) {
-          elementLocation.scrollIntoView({behavior: "auto", block: "center"})
-          let color = elementLocation.style.background
-          elementLocation.style.background = "#faecd8"
-          setTimeout(() => {
-            elementLocation.style.background = color
-          }, 1000)
-        } else {
-          store.commit("alert", {message: "已被删除", type: "warning"})
-        }
-        store.commit("setGotoElement", "")
-      }
-    })
-  })
-}).catch(() => {
-  postIsLoading.value = false
-})
 </script>
 
 <style scoped>
