@@ -12,7 +12,7 @@
           </div>
         </el-col>
         <el-col :span="4">
-          <slot :post="post"></slot>
+          <slot :post="post" :idx="idx"></slot>
         </el-col>
         <el-divider></el-divider>
       </el-row>
@@ -29,6 +29,7 @@ import {getUserByUid} from "@/api/user"
 import {getPostsByPids} from "@/api/post"
 import {getImg} from "@/api/image"
 import store from "@/store"
+import {POST_PER_PAGE} from "@/config/constVal.js"
 
 const props = defineProps({
   postIds: {
@@ -42,6 +43,9 @@ const props = defineProps({
   description: {
     type: String,
     required: true,
+  },
+  delPost: {
+    type: Object,
   },
 })
 // 获取帖子
@@ -83,7 +87,6 @@ const getPosts = async () => {
             resPosts.forEach((v, i) => {
               v.post_time = v.post_time.slice(0, 10) + " " + v.post_time.slice(11, 16)
               v.img_id = getImg(v.img_id)
-              v.exist = true
             })
             break
           //用户资料收藏
@@ -112,9 +115,13 @@ const getPosts = async () => {
   }
   postsList.value.push(resPosts)
   isLoading.value = false
-  nextTick(() => {
-    getPostsObserver.observe(elementList[elementList.length - 1])
-  })
+  if (activePageIds.length === POST_PER_PAGE) {
+    nextTick(() => {
+      getPostsObserver.observe(elementList[elementList.length - 1])
+    })
+  } else {
+    noData.value = true
+  }
 }
 // 进入帖子详情
 const router = useRouter()
@@ -149,6 +156,11 @@ watch(postIds, () => {
   getPosts()
 })
 const {description} = toRefs(props)
+// 移除帖子
+const {delPost} = toRefs(props)
+watch(delPost, (v) => {
+  postsList.value[delPost.value.idx].splice(postsList.value[delPost.value.idx].indexOf(delPost.value.post), 1)
+})
 </script>
 
 <style scoped>

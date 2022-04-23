@@ -25,7 +25,7 @@
 </template>
 
 <script setup>
-import {ref} from "vue"
+import {onMounted, ref} from "vue"
 import AddPicture from "@/components/AddPicture.vue"
 import store from "@/store"
 import {createPost} from "@/api/post.js"
@@ -55,7 +55,9 @@ const content = ref("")
 const router = useRouter()
 //引用
 const inputRef = ref()
-defineExpose({inputRef})
+onMounted(() => {
+  inputRef.value.focus()
+})
 //
 //@人
 const atInput = ref("")
@@ -174,7 +176,7 @@ const send = async () => {
   justify-content: end;
 }
 
-.at-input >>> .el-input__inner {
+.at-input:deep(.el-input__inner) {
   padding-left: 24px !important;
 }
 </style>

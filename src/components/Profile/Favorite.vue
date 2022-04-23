@@ -31,7 +31,7 @@ const getFavoriteIds = async () => {
     description.value = "暂无权限访问"
     postIds.value = []
   } else {
-    store.commit("alert", {message: "未处理的响应", type: "type"})
+    store.commit("alert", {message: "未处理的响应", type: "error"})
   }
 }
 getFavoriteIds()

@@ -101,7 +101,7 @@ const changePwd = async () => {
 .login-bg {
   width: 100vw;
   height: 100vh;
-  background: url("/image/login-bg.jpg");
+  background: url("/image/login-bg.webp");
 }
 
 .login-card {

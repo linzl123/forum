@@ -123,7 +123,6 @@ const delMessage = async (at) => {
     at.handleText = "已移除"
     store.commit("alert", {message: "移除成功", type: "success"})
     if (at.is_unread) {
-      console.log(at)
       at.is_unread = false
       store.commit("setMessage", [4, -1])
     }

@@ -80,8 +80,8 @@
           <!--    评论-->
           <div v-for="(comments,idx) in commentsList" :key="'c'+idx">
             <div v-for="comment in comments" :key="'cc'+comment.cid" class="comment-item">
-              <comment-detail :lz-uid="lzUid" :comment="comment"
-                              @getReplies="getReplies(comment)" @delComment="delComment">
+              <comment-detail :lz-uid="lzUid" :comment="comment" :idx="idx"
+                              @getReplies="getReplies(comment)" @delComment="delComment(idx,$event)">
               </comment-detail>
             </div>
           </div>
@@ -188,10 +188,7 @@ const commentsList = ref([])
 let activePage = -1, activePageIds = null
 const commentIsLoading = ref(true)
 const noData = ref(false)
-let getCommentsLock = false
 const getComments = async () => {
-  if (getCommentsLock) return
-  getCommentsLock = true
   commentIsLoading.value = true
   activePageIds = commentIds[++activePage]
   if (activePageIds == null) {
@@ -238,43 +235,46 @@ const getComments = async () => {
   })
   commentsList.value.push(resComments)
   commentIsLoading.value = false
-  nextTick(() => {
-    getPostsObserver.observe(elementList[elementList.length - (Math.ceil(POST_PER_PAGE / 2))])
-  })
-  getCommentsLock = false
+  if (activePageIds.length === POST_PER_PAGE) {
+    if (store.state.gotoElement === "")
+      nextTick(() => {
+        getPostsObserver.observe(elementList[elementList.length - (Math.ceil(POST_PER_PAGE / 2))])
+      })
+  } else {
+    noData.value = true
+  }
 }
 const getReplies = async (comment) => {
   let res = await getCommentWithRepliesByCid(comment.cid)
   comment.replies = res.replies
 }
-getPost().then(() => {
+getPost().then(async () => {
   postIsLoading.value = false
-  getComments().then(() => {
-    nextTick(async () => {
-      if (store.state.gotoElement) {
-        let elementLocation = null, noFind = true
-        while (!noData.value) {
-          elementLocation = document.querySelector(store.state.gotoElement)
-          if (elementLocation) {
-            elementLocation.scrollIntoView({behavior: "auto", block: "center"})
-            let color = elementLocation.style.background
-            elementLocation.style.background = "#faecd8"
-            setTimeout(() => {
-              elementLocation.style.background = color
-            }, 1000)
-            noFind = false
-            break
-          } else {
-            await getComments()
-          }
-        }
-        if (noFind) {
-          store.commit("alert", {message: "已被删除", type: "warning"})
-        }
-        store.commit("setGotoElement", "")
+  if (store.state.gotoElement === "") getComments()
+  else {
+    let elementLocation = null, noFind = true
+    while (!noData.value) {
+      await getComments()
+      await nextTick(() => {
+        elementLocation = document.querySelector(store.state.gotoElement)
+      })
+      if (elementLocation) {
+        elementLocation.scrollIntoView({behavior: "auto", block: "center"})
+        let color = elementLocation.style.background
+        elementLocation.style.background = "#faecd8"
+        setTimeout(() => {
+          elementLocation.style.background = color
+        }, 1000)
+        noFind = false
+        break
       }
-    })
-  })
+    }
+    if (noFind) {
+      store.commit("alert", {message: "已被删除", type: "warning"})
+    }
+    getPostsObserver.observe(elementList[elementList.length - (Math.ceil(POST_PER_PAGE / 2))])
+    store.commit("setGotoElement", "")
+  }
 }).catch(() => {
   postIsLoading.value = false
 })
@@ -296,21 +296,21 @@ let elementList = null
 nextTick(() => {
   elementList = document.getElementsByClassName("comment-item")
 })
-// 发表评论
+// 评论、刷新、回到顶部
 const toSendComment = ref(false)
-// 刷新
 const refresh = debounce(() => {
   activePage = -1
   commentsList.value = []
-  getComments().then(() => {
-    store.commit("alert", {message: "刷新成功", type: "success"})
+  noData.value = false
+  getPost().then(() => {
+    getComments().then(() => {
+      store.commit("alert", {message: "刷新成功", type: "success"})
+    })
   })
 })
-// 回到顶部
 const gotoTop = () => {
   scrollTo(0, 0)
 }
-//删除
 const deletePost = async () => {
   let message, type
   let res = await deletePostByPid(pid)
@@ -324,8 +324,8 @@ const deletePost = async () => {
   }
   store.commit("alert", {message, type})
 }
-const delComment = (cid) => {
-  comments.value.splice(comments.value.findIndex((i) => i.cid === cid), 1)
+const delComment = (idx, cid) => {
+  commentsList.value[idx].splice(commentsList.value[idx].findIndex((i) => i.cid === cid), 1)
 }
 //
 const onlyLz = ref("false")

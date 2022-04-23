@@ -21,9 +21,9 @@
       </div>
       <div class="content-tail">
         <div @click="agree">
-          <svg  class="agree-icon" viewBox="0 0 1024 1024"
+          <svg class="agree-icon" viewBox="0 0 1024 1024"
                xmlns="http://www.w3.org/2000/svg"
-                width="200" height="200">
+               width="200" height="200">
             <path
               d="M612.910545 372.037818h226.56a93.090909 93.090909 0 0 1 91.834182 108.334546l-61.905454 372.689454A93.090909 93.090909 0 0 1 777.565091 930.909091H374.690909V372.037818c82.152727-81.338182 72.890182-210.571636 88.832-242.338909 15.965091-31.767273 47.639273-36.119273 55.645091-36.608 39.68 0 179.665455 32.395636 93.765818 278.946909zM315.531636 372.363636v558.545455H204.613818a93.090909 93.090909 0 0 1-92.997818-88.901818l-16.709818-372.363637A93.090909 93.090909 0 0 1 187.904 372.363636h127.627636z"
               :fill="agreeColor"></path>
@@ -34,7 +34,7 @@
         <div @click="disagree">
           <svg class="agree-icon" viewBox="0 0 1024 1024"
                xmlns="http://www.w3.org/2000/svg"
-                width="200" height="200">
+               width="200" height="200">
             <path
               d="M611.188364 651.962182h226.56a93.090909 93.090909 0 0 0 91.834181-108.334546l-61.905454-372.689454A93.090909 93.090909 0 0 0 775.889455 93.090909H372.968727v558.871273c82.152727 81.338182 72.866909 210.571636 88.832 242.338909 15.941818 31.767273 47.616 36.119273 55.621818 36.608 39.703273 0 179.665455-32.395636 93.789091-278.946909zM313.832727 651.636364V93.090909H202.891636a93.090909 93.090909 0 0 0-92.997818 88.901818l-16.709818 372.363637A93.090909 93.090909 0 0 0 186.181818 651.636364h127.650909z"
               :fill="disagreeColor"></path>
@@ -63,7 +63,7 @@
         <reply-detail v-show="showReply" :replies="comment.replies" :cid="comment.cid"
                       :lz-uid="lzUid" :cz-uid="comment.u_id"
                       @getReplies="getReplies" @delReply="delReply"
-                      @removedComment="removedComment(comment.cid)">
+                      @removedComment="emits('delComment',  comment.cid)">
         </reply-detail>
       </el-row>
     </el-col>
@@ -86,6 +86,10 @@ const props = defineProps({
     required: true,
   },
   lzUid: {
+    type: Number,
+    required: true,
+  },
+  idx: {
     type: Number,
     required: true,
   },
@@ -127,10 +131,6 @@ const deleteComment = debounce(async (comment) => {
   }
   store.commit("alert", {message, type})
 })
-
-const removedComment = (cid) => {
-  emits("delComment", cid)
-}
 // 赞同 or 不赞同
 const UNKNOWN_COLOR = "#8a8a8a"
 const ENSURE_COLOR = "#1296db"

@@ -29,30 +29,24 @@ if (route.name === "Favorite") {
   })
 }
 const handleFavorite = debounce(async (pid) => {
-  let message, type
   if (own.value) {
     let res = await removeFavoriteByPid(pid)
     if (res.state === 100) {
-      message = "取消收藏成功"
-      type = "success"
       handle.value = "收藏"
+      store.commit("alert", {message: "取消收藏成功", type: "success"})
     } else {
-      message = res.state_message
-      type = "error"
+      store.commit("alert", {message: res.state_message, type: "error"})
     }
   } else {
     let res = await addFavoriteByPid(pid)
     if (res.state === 100) {
-      message = "收藏成功"
-      type = "success"
       handle.value = "取消收藏"
+      store.commit("alert", {message: "收藏成功", type: "success"})
     } else {
-      message = res.state_message
-      type = "error"
+      store.commit("alert", {message: res.state_message, type: "error"})
     }
   }
   own.value = !own.value
-  store.commit("alert", {message, type})
 })
 </script>
 

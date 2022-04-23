@@ -1,7 +1,7 @@
 <template>
-  <post-list :post-ids="postIds" origin="ProfilePost" :description="description">
-    <template v-if="store.state.ownId===Number(route.params.id)" #default="{post}">
-      <post-handle :post="post"></post-handle>
+  <post-list :post-ids="postIds" origin="ProfilePost" :description="description" :delPost="delPost">
+    <template v-if="store.state.ownId===Number(route.params.id)" #default="{idx,post}">
+      <el-button type="danger" plain @click="deletePost(idx,post)">删除</el-button>
     </template>
   </post-list>
 </template>
@@ -9,16 +9,15 @@
 <script setup>
 import {ref} from "vue"
 import PostList from "@/components/PostList.vue"
-import {getAllPostIdsByUid} from "@/api/post.js"
+import {deletePostByPid, getAllPostIdsByUid} from "@/api/post.js"
 import {POST_PER_PAGE} from "@/config/constVal.js"
 import {useRoute} from "vue-router"
 import {chunk} from "@/utils/array.js"
-import PostHandle from "@/components/Profile/PostHandle.vue"
 import store from "@/store"
 
 const route = useRoute()
 const postIds = ref([])
-const description = ref("快去发表更多帖子吧")
+const description = ref("暂无更多帖子")
 const getPostIds = async () => {
   let res = await getAllPostIdsByUid(route.params.id)
   if (res.state === 100) {
@@ -35,6 +34,16 @@ const getPostIds = async () => {
   }
 }
 getPostIds()
+const delPost = ref()
+const deletePost = async (idx, post) => {
+  let res = await deletePostByPid(post.post_id)
+  if (res.state === 100) {
+    delPost.value = {idx, post}
+    store.commit("alert", {message: "删除成功", type: "success"})
+  } else {
+    store.commit("alert", {message: res.state_message, type: "error"})
+  }
+}
 </script>
 
 <style scoped>

@@ -36,13 +36,6 @@
       </el-row>
     </el-header>
     <el-main class="container-main">
-      <!--      <router-view v-slot="{Component,route}">-->
-      <!--        <transition name="fade" mode="out-in">-->
-      <!--          <keep-alive exclude="PostDetail,Message">-->
-      <!--            <component :is="Component" :key="route.path"></component>-->
-      <!--          </keep-alive>-->
-      <!--        </transition>-->
-      <!--      </router-view>-->
       <router-view v-slot="{Component,route}">
         <keep-alive include="Home,ZonePost">
           <component :is="Component" :key="route.path"></component>
@@ -50,7 +43,6 @@
       </router-view>
     </el-main>
   </el-container>
-  <el-backtop/>
 </template>
 
 <script setup>
@@ -153,6 +145,7 @@ function init() {
 }
 
 let lockReconnect = false
+
 function reconnect(url) {
   if (lockReconnect) return
   lockReconnect = true

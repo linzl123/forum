@@ -71,20 +71,20 @@ const avatar = store.state.userMap.get(uid).avatar
 // 分区跳转
 const zoneList = [
   {
-    banner: "/image/banner-1.jpg",
-    logo: "/image/logo-1.jpg",
+    banner: "/image/banner-1.webp",
+    logo: "/image/logo-1.webp",
     title: "闲聊",
     slogan: "偷得浮生半日闲",
   },
   {
-    banner: "/image/banner-2.jpg",
-    logo: "/image/logo-2.jpg",
+    banner: "/image/banner-2.webp",
+    logo: "/image/logo-2.webp",
     title: "学习",
     slogan: "博学笃行，与时俱进",
   },
   {
-    banner: "/image/banner-3.jpg",
-    logo: "/image/logo-3.jpg",
+    banner: "/image/banner-3.webp",
+    logo: "/image/logo-3.webp",
     title: "交易",
     slogan: "客官，来点什么吧",
   },

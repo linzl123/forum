@@ -182,7 +182,8 @@ body {
   left: 50%;
   top: 45%;
   list-style: none;
-  margin-left: 450px;
+  margin-left: 500px;
+  padding-left: 0;
 }
 
 .tool-sidebar-icon {

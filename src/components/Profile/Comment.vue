@@ -1,7 +1,7 @@
 <template>
   <div>
     <template v-if="store.state.ownId===Number(route.params.id)">
-      <div v-for="(comments,idx) in commentsList" :key="'c'+idx" class="comment-item">
+      <div v-for="(comments,idx) in commentsList" :key="'c'+idx" class="comments-item">
         <el-row v-for="comment in comments" :key="comment.comment_id">
           <el-col :span="20">
             <div class="comment-text" @click="goto(comment)">
@@ -12,9 +12,8 @@
             </div>
           </el-col>
           <el-col :span="4">
-            <el-button :disabled="!comment.exist" type="danger" plain
-                       @click="deleteComment(comment)">
-              {{ comment.handle }}
+            <el-button type="danger" plain @click="deleteComment(idx,comment)">
+              删除
             </el-button>
           </el-col>
           <el-divider></el-divider>
@@ -23,7 +22,7 @@
     </template>
 
     <template v-else>
-      <div v-for="(comments,idx) in commentsList" :key="'c'+idx" class="comment-item">
+      <div v-for="(comments,idx) in commentsList" :key="'c'+idx" class="comments-item">
         <el-row v-for="comment in comments" :key="comment.comment_id">
           <div class="comment-text" @click="goto(comment)">
             {{ comment.comment_txt }}
@@ -35,7 +34,6 @@
         </el-row>
       </div>
     </template>
-
     <div v-if="noData" class="no-data">{{ description }}</div>
     <div v-loading="isLoading" style="margin-top: 18px"></div>
   </div>
@@ -61,12 +59,9 @@ const getCommentIds = async () => {
   if (res.state === 100) {
     if (res.comment_ids) {
       commentIds = chunk(res.comment_ids, POST_PER_PAGE)
-    } else {
-      return Promise.reject()
     }
   } else if (res.state === 103) {
     description.value = "暂无权限访问"
-    return Promise.reject()
   } else {
     store.commit("alert", {message: "未经处理的响应", type: "type"})
   }
@@ -92,42 +87,35 @@ const getComments = async () => {
     v.comment_id = activePageIds[i]
     v.comment_time = v.comment_time.slice(0, 10) + " " + v.comment_time.slice(11, 16)
     v.img_id = getImg(v.img_id)
-    v.exist = true
-    v.handle = "删除"
   })
   commentsList.value.push(resComments)
   isLoading.value = false
-  nextTick(() => {
-    getPostsObserver.observe(elementList[elementList.length - 1])
-  })
+  if (activePageIds.length === POST_PER_PAGE) {
+    nextTick(() => {
+      getPostsObserver.observe(elementList[elementList.length - 1])
+    })
+  } else {
+    noData.value = true
+  }
 }
 getCommentIds().then(() => {
   getComments()
-}).catch(() => {
-  isLoading.value = false
 })
 //
 const goto = (comment) => {
-  comment.exist ?
-    router.push("/post/" + comment.post_id).then(() => {
-      store.commit("setGotoElement", "#c" + comment.comment_id)
-    })
-    : store.commit("alert", {message: "评论已被删除", type: "info"})
+  router.push("/post/" + comment.post_id).then(() => {
+    store.commit("setGotoElement", "#c" + comment.comment_id)
+  })
 }
 //删除评论
-const deleteComment = debounce(async (comment) => {
-  let message, type
+const deleteComment = debounce(async (idx, comment) => {
   let res = await deleteCommentByCid(comment.comment_id)
   if (res.state === 100) {
-    message = "删除成功"
-    type = "success"
-    comment.exist = false
-    comment.handle = "已删除"
+    commentsList.value[idx].splice(commentsList.value[idx].indexOf(comment), 1)
+    store.commit("alert", {message: "删除成功", type: "success"})
   } else {
-    message = res.state_message
-    type = "error"
+    store.commit("alert", {message: res.state_message, type: "error"})
   }
-  store.commit("alert", {message, type})
 })
 // 监听最后第X个元素
 const getPostsObserver = new IntersectionObserver(
@@ -145,7 +133,7 @@ const getPostsObserver = new IntersectionObserver(
 )
 let elementList = null
 nextTick(() => {
-  elementList = document.getElementsByClassName("comment-item")
+  elementList = document.getElementsByClassName("comments-item")
 })
 </script>
 

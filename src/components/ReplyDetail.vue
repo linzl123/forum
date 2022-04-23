@@ -241,13 +241,13 @@ const sendReply = debounce(async () => {
     emits("getReplies")
     store.commit("alert", {message: "回复成功", type: "success"})
   } else if (res.state === 101) {
-    if (res.state_message.startsWith("回复")) {
+    if (target.value === 0) {
+      emits("removedComment")
+      store.commit("alert", {message: "评论已被删除，无法回复", type: "warning"})
+    } else {
       emits("delReply", target.value)
       tagRef.value.$emit("close")
       store.commit("alert", {message: "引用已被删除，无法回复", type: "warning"})
-    } else {
-      emits("removedComment")
-      store.commit("alert", {message: "评论已被删除，无法回复", type: "warning"})
     }
   } else {
     store.commit("alert", {message: res.state_message, type: "error"})

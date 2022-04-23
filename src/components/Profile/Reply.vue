@@ -9,9 +9,8 @@
             </div>
           </el-col>
           <el-col :span="4">
-            <el-button :disabled="!reply.exist" type="danger" plain
-                       @click="deleteReply(reply)">
-              {{ reply.handle }}
+            <el-button type="danger" plain @click="deleteReply(idx,reply)">
+              删除
             </el-button>
           </el-col>
           <el-divider></el-divider>
@@ -51,16 +50,12 @@ const description = ref("暂无更多回复")
 let replyIds = []
 const getReplyIds = async () => {
   let res = await getReplyByUid(route.params.id)
-  console.log(res)
   if (res.state === 100) {
     if (res.reply_ids) {
       replyIds = chunk(res.reply_ids, POST_PER_PAGE)
-    } else {
-      return Promise.reject()
     }
   } else if (res.state === 103) {
     description.value = "暂无权限访问"
-    return Promise.reject()
   } else {
     store.commit("alert", {message: "未处理的响应", type: "type"})
   }
@@ -86,42 +81,35 @@ const getReplies = async () => {
   resReplies.forEach((v, i) => {
     v.reply_id = activePageIds[i]
     v.reply_time = v.reply_time.slice(0, 10) + " " + v.reply_time.slice(11, 16)
-    v.exist = true
-    v.handle = "删除"
   })
   repliesList.value.push(resReplies)
   isLoading.value = false
-  nextTick(() => {
-    getPostsObserver.observe(elementList[elementList.length - 1])
-  })
+  if (activePageIds.length === POST_PER_PAGE) {
+    nextTick(() => {
+      getPostsObserver.observe(elementList[elementList.length - 1])
+    })
+  } else {
+    noData.value = true
+  }
 }
 getReplyIds().then(() => {
   getReplies()
-}).catch(() => {
-  isLoading.value = false
 })
 //
 const goto = (reply) => {
-  reply.exist ?
-    router.push("/post/" + reply.post_id).then(() => {
-      store.commit("setGotoElement", "#c" + reply.comment_id + "r" + reply.reply_id)
-    })
-    : store.commit("alert", {message: "回复已被删除", type: "info"})
+  router.push("/post/" + reply.post_id).then(() => {
+    store.commit("setGotoElement", "#c" + reply.comment_id + "r" + reply.reply_id)
+  })
 }
 //删除回复
-const deleteReply = debounce(async (reply) => {
-  let message, type
+const deleteReply = debounce(async (idx, reply) => {
   let res = await deleteReplyByRid(reply.reply_id)
   if (res.state === 100) {
-    message = "删除成功"
-    type = "success"
-    reply.handle = "已删除"
-    reply.exist = false
+    repliesList.value[idx].splice(repliesList.value[idx].indexOf(reply), 1)
+    store.commit("alert", {message: "删除成功", type: "success"})
   } else {
-    message = res.state_message
-    type = "error"
+    store.commit("alert", {message: res.state_message, type: "error"})
   }
-  store.commit("alert", {message, type})
 })
 // 监听最后第X个元素
 const getPostsObserver = new IntersectionObserver(
