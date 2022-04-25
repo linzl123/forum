@@ -378,15 +378,6 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
 }
-/*.new-message {*/
-/*  position: absolute;*/
-/*  left: 75%;*/
-/*  top: 55%;*/
-/*  background-color: #ffffff;*/
-/*  padding: 5px 8px;*/
-/*  display: flex;*/
-/*  align-items: center;*/
-/*}*/
 
 .new-message-text {
   color: #09bb07;
