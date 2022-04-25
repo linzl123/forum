@@ -1,6 +1,6 @@
 <template>
   <div class="reply-area">
-    <el-row v-for="reply in replies" :key="replyKey(reply)" :id="replyKey(reply)">
+    <el-row v-for="reply in replies" :key="replyKey(reply)">
       <el-col :span="1">
         <img class="img-32" :src="reply.avatar" alt="avatar"/>
         <div v-if="reply.isCz" class="cz-icon" title="层主"></div>
@@ -8,7 +8,7 @@
       </el-col>
       <el-col :span="23">
         <el-row>
-          <div class="reply-main">
+          <div class="reply-main" :id="replyKey(reply)">
             <span class="user-nickname" @click="router.push('/profile/'+reply.u_id)">
               {{ reply.sender }}
             </span>
