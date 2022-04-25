@@ -36,11 +36,17 @@
       </el-row>
     </el-header>
     <el-main class="container-main">
+      <!--      <router-view></router-view>-->
       <router-view v-slot="{Component,route}">
         <keep-alive include="Home,ZonePost">
-          <component :is="Component" :key="route.path"></component>
+          <component :is="Component" :key="route.matched[1].path + route.params?.idx"></component>
         </keep-alive>
       </router-view>
+      <!--      <router-view v-slot="{Component,route}">-->
+      <!--        <keep-alive include="Home,ZonePost">-->
+      <!--          <component :is="Component" :key="route.path"></component>-->
+      <!--        </keep-alive>-->
+      <!--      </router-view>-->
     </el-main>
   </el-container>
 </template>

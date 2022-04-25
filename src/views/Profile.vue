@@ -101,6 +101,7 @@ let username
 const nickname = ref()
 const avatarSrc = ref()
 //
+console.log(123)
 const profileList = [
   ["帖子", "Post"],
   ["评论", "Comment"],
