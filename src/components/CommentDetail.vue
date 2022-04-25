@@ -1,5 +1,5 @@
 <template>
-  <el-row :gutter="20" :id="commentKey(comment.cid)">
+  <el-row :gutter="20">
     <el-col :span="3" class="sender-info">
       <div class="author">
         <img class="img-80" :src="comment.avatar" alt="avatar"/>
@@ -8,7 +8,7 @@
       <span class="user-nickname" @click="router.push('/profile/'+comment.u_id)">{{ comment.sender }}</span>
     </el-col>
     <el-col :span="21">
-      <div class="content-main">
+      <div class="content-main" :id="commentKey(comment.cid)">
         <span v-for="(nickname,uid) in comment.someone_be_at" :key="uid">
           @<span class="user-nickname" @click="router.push('/profile/'+uid)">{{ nickname }}</span>
         </span>
