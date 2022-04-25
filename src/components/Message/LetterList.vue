@@ -372,12 +372,21 @@ onUnmounted(() => {
 .new-message {
   position: absolute;
   left: 75%;
-  top: 55%;
+  top: calc(100% - 250px);
   background-color: #ffffff;
   padding: 5px 8px;
   display: flex;
   align-items: center;
 }
+/*.new-message {*/
+/*  position: absolute;*/
+/*  left: 75%;*/
+/*  top: 55%;*/
+/*  background-color: #ffffff;*/
+/*  padding: 5px 8px;*/
+/*  display: flex;*/
+/*  align-items: center;*/
+/*}*/
 
 .new-message-text {
   color: #09bb07;
