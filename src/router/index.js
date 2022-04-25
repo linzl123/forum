@@ -16,7 +16,7 @@ const routes = [
         component: () => import("@/views/ZonePost.vue"),
       },
       {
-        path: "/zone/:idx",
+        path: "/zone/:id",
         component: () => import("@/views/ZonePost.vue"),
       },
       {

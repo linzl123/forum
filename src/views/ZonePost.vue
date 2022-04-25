@@ -101,7 +101,7 @@ const zoneList = [
 ]
 const route = useRoute()
 const router = useRouter()
-const idx = ref(Number(route.params.idx ?? 0))
+const idx = ref(Number(route.params.id ?? 0))
 const postIds = ref([])
 const getPostIds = async () => {
   let res, tmpPostIds = []
