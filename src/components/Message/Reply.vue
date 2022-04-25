@@ -35,7 +35,7 @@
 
 <script setup>
 import {deleteMessage, getReplyMessage, readMessage} from "@/api/message.js"
-import {ref} from "vue"
+import {onUnmounted, ref} from "vue"
 import {useRouter} from "vue-router"
 import store from "@/store"
 import {getUserByUid} from "@/api/user.js"
@@ -61,16 +61,21 @@ const getMessage = async () => {
   }
   isLoading.value = false
 }
-window.ws.addEventListener("message", (e) => {
+//未读监听
+const wsMessageListener = (e) => {
   if (JSON.parse(e.data).message_type === 2) {
     getMessage()
   }
+}
+window.ws.addEventListener("message", wsMessageListener)
+onUnmounted(() => {
+  window.ws.removeEventListener("message", wsMessageListener)
 })
 //跳转
 const goto = (reply) => {
   if (reply.is_unread)
     readMessage(2, reply.reply_id).then(() => {
-      store.commit("setMessage", [2, -1])
+      store.commit("addMessage", [2, -1])
     })
   router.push("/post/" + reply.post_id).then(() => {
     store.commit("setGotoElement", "#c" + reply.comment_id + "r" + reply.reply_id)
@@ -82,7 +87,7 @@ const removeUnread = async (reply) => {
   if (res.state === 100) {
     reply.is_unread = false
     store.commit("alert", {message: "已读", type: "success"})
-    store.commit("setMessage", [2, -1])
+    store.commit("addMessage", [2, -1])
   } else {
     store.commit("alert", {message: res.state_message, type: "error"})
   }
@@ -109,7 +114,7 @@ const delMessage = async (reply) => {
     store.commit("alert", {message: "移除成功", type: "success"})
     if (reply.is_unread) {
       reply.is_unread = false
-      store.commit("setMessage", [2, -1])
+      store.commit("addMessage", [2, -1])
     }
   } else {
     store.commit("alert", {message: res.state_message, type: "error"})

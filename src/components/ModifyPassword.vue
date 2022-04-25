@@ -14,7 +14,7 @@
       <el-form-item label="新密码" prop="newPwd">
         <el-input v-model="pwdForm.newPwd" type="password" show-password></el-input>
       </el-form-item>
-      <el-form-item label="确认密码" prop="checkPwd">
+      <el-form-item label="确认密码" prop="checkPwd" @keyup.enter.exact="savePwd">
         <el-input v-model="pwdForm.checkPwd" type="password" show-password></el-input>
       </el-form-item>
     </el-form>

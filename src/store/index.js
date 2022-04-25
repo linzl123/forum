@@ -19,10 +19,10 @@ export default createStore({
   },
   mutations: {
     setMessage(state, payload) {
-      state.message[payload[0]] += payload[1]
+      state.message[payload[0]] = payload[1]
     },
     addMessage(state, payload) {
-      state.message[payload]++
+      state.message[payload[0]] += payload[1]
     },
     delMessage(state, payload) {
       state.message[payload] = 0

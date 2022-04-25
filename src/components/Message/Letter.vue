@@ -1,5 +1,5 @@
 <template>
-  <el-card shadow="never">
+  <el-card shadow="never" body-style="padding:0">
     <template #header>
       <div class="msg-head">
         <el-button @click="readAll" :loading="readAllLoading">一键已读</el-button>
@@ -11,17 +11,17 @@
       <template v-if="msgKeys.length">
         <el-row>
           <el-col :span="6" class="user-list">
-            <el-badge v-for="uid in msgKeys" :key="uid"
-                      :value="unreadLettersList[uid].length?unreadLettersList[uid].length:''">
-              <el-row class="user-item" :class="{'active-item':activeUid===uid}" @click="selUser(uid)">
+            <div v-for="uid in msgKeys" :key="uid" class="user-hover" :class="{'active-item':activeUid===uid}">
+              <el-row class="user-item" @click="selUser(uid)">
+                <div class="close" @click.stop="delMessage(uid)">✖</div>
+                <el-badge class="unread-count" :value="unreadLettersList[uid].length?unreadLettersList[uid].length:''"/>
                 <el-avatar :src="store.state.userMap.get(Number(uid)).avatar" class="user-avatar"></el-avatar>
                 <div>
                   <div>{{ store.state.userMap.get(Number(uid)).nickname }}</div>
                   <div class="latest-txt">{{ msgList[uid].slice(-1)[0].chat_txt }}</div>
                 </div>
-                <div class="close" @click.stop="delMessage(uid)">✖</div>
               </el-row>
-            </el-badge>
+            </div>
           </el-col>
           <el-col :span="18">
             <letter-list :tarUid="Number(activeUid)" :dialog="msgList[activeUid]"
@@ -41,7 +41,7 @@
 
 <script setup>
 import {deleteMessage, getLetterByUid, getLetterMessage, readMessage} from "@/api/message.js"
-import {computed, ref} from "vue"
+import {computed, onUnmounted, ref} from "vue"
 import {useRouter} from "vue-router"
 import store from "@/store"
 import {getUserByUid} from "@/api/user.js"
@@ -87,7 +87,9 @@ const getMessage = async () => {
   }
   return msgKeys.value[0]
 }
-window.ws.addEventListener("message", (e) => {
+
+//未读监听
+const wsMessageListener = (e) => {
   if (JSON.parse(e.data).message_type === 3) {
     if (msgKeys.value.length === 0) isLoading.value = true
     getMessage().then((ret) => {
@@ -95,18 +97,22 @@ window.ws.addEventListener("message", (e) => {
       isLoading.value = false
     })
   }
+}
+window.ws.addEventListener("message", wsMessageListener)
+onUnmounted(() => {
+  window.ws.removeEventListener("message", wsMessageListener)
 })
 //清除未读
 const removeOneUnread = (lid) => {
   msgList.value[activeUid.value].find(v => v.chat_id === lid).is_unread = false
   readMessage(3, lid).then(() => {
-    store.commit("setMessage", [3, -1])
+    store.commit("addMessage", [3, -1])
   })
 }
 const removeUnread = (uid) => {
   unreadLettersList.value[uid].forEach((v) => {
     readMessage(3, v)
-    store.commit("setMessage", [3, -1])
+    store.commit("addMessage", [3, -1])
   })
   msgList.value[uid].forEach(v => v.is_unread = false)
 }
@@ -172,16 +178,16 @@ getMessage().then((ret) => {
 </script>
 
 <style scoped>
+.user-hover:hover {
+  width: 100%;
+  background-color: #e4e5e6;
+  cursor: pointer;
+}
+
 .user-item {
   height: 60px;
   align-items: center;
   justify-content: center;
-}
-
-.user-item:hover {
-  width: 100%;
-  background-color: #e4e5e6;
-  cursor: pointer;
 }
 
 .user-avatar {
@@ -190,7 +196,7 @@ getMessage().then((ret) => {
 }
 
 .latest-txt {
-  width: 130px;
+  width: 140px;
   color: #999999;
   font-size: 12px;
   overflow: hidden;
@@ -199,18 +205,26 @@ getMessage().then((ret) => {
 }
 
 .close {
-  display: none;
+  display: block;
   position: absolute;
+  top: 18px;
+  left: -18px;
   color: #F56C6C;
+  transition: left 300ms;
 }
 
 .user-item:hover .close {
   display: block;
-  top: 1px;
-  left: 173px;
+  left: 2px;
 }
 
 .active-item {
   background-color: #e4e5e6;
+}
+
+.unread-count {
+  position: absolute;
+  top: 0;
+  left: 188px;
 }
 </style>

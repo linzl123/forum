@@ -25,22 +25,34 @@
       </div>
     </div>
     <div class="dialog-list">
-      <div v-for="msg in dialog" :key="msg.chat_id" :id="letterId(msg.chat_id)" class="dialog-item">
-        <div class="user-info">
-          <el-avatar :size="25" class="user-item user-avatar"
-                     :src="msg.am_i_sender?ownAvatar : tarAvatar" @click="goto(msg.am_i_sender)">
-          </el-avatar>
-          <span class="user-item content-text">
-            {{ msg.am_i_sender ? ownNickname : tarNickname }}
-          </span>
-          <span class="user-item">{{ msg.chat_time }}</span>
-        </div>
-        <div class="content-item">
-          {{ msg.chat_txt }}
-          <div>
-            <img class="content-img" :src="getImg(msg.img_id)"/>
+      <div v-for="msg in dialog" :key="msg.chat_id" :id="letterId(msg.chat_id)" class="dialog-message">
+        <div class="dialog-time">{{ msg.chat_time }}</div>
+        <template v-if="msg.am_i_sender">
+          <div class="dialog-item">
+            <div class="own-user">
+              <el-avatar :size="30" class="user-avatar"
+                         :src="ownAvatar" @click="gotoOwn">
+              </el-avatar>
+            </div>
+            <div class="own-content">
+              <div>{{ msg.chat_txt }}</div>
+              <img v-if="msg.img_id" class="content-img" :src="getImg(msg.img_id)"/>
+            </div>
           </div>
-        </div>
+        </template>
+        <template v-else>
+          <div class="dialog-item">
+            <div class="peer-user">
+              <el-avatar :size="30" class="user-avatar"
+                         :src="tarAvatar" @click="gotoPeer">
+              </el-avatar>
+            </div>
+            <div class="peer-content">
+              <div>{{ msg.chat_txt }}</div>
+              <img v-if="msg.img_id" class="content-img" :src="getImg(msg.img_id)"/>
+            </div>
+          </div>
+        </template>
       </div>
     </div>
 
@@ -156,8 +168,11 @@ const upload = (e) => {
   imgSrc.value = URL.createObjectURL(imgFile)
 }
 // 点击头像跳转到个人资料
-const goto = (own) => {
-  own ? router.push("/profile/" + ownUid) : router.push("/profile/" + props.tarUid)
+const gotoPeer = () => {
+  router.push("/profile/" + props.tarUid)
+}
+const gotoOwn = () => {
+  router.push("/profile/" + ownUid)
 }
 // 首次进入+切换用户的滚动+观察是否已读消息
 const callback = (entries, observer) => {
@@ -182,9 +197,9 @@ nextTick(() => {
   if (props.unreadLetters.length > 0) {
     document.querySelector("#l" + props.unreadLetters[0]).scrollIntoView({behavior: "auto", block: "start"})
   } else {
-    document.querySelector(".dialog-item:last-child").scrollIntoView({behavior: "auto", block: "start"})
+    document.querySelector(".dialog-message:last-child").scrollIntoView({behavior: "auto", block: "start"})
   }
-  msgElements = document.getElementsByClassName("dialog-item")
+  msgElements = document.getElementsByClassName("dialog-message")
   readObserver = new IntersectionObserver(callback, options)
   Array.from(msgElements).forEach((v) => {
     readObserver.observe(v)
@@ -222,7 +237,7 @@ watch(dialog, () => {
       if (props.unreadLetters.length > 0) {
         document.querySelector("#l" + props.unreadLetters[0]).scrollIntoView({behavior: "auto", block: "start"})
       } else {
-        document.querySelector(".dialog-item:last-child").scrollIntoView({behavior: "auto", block: "start"})
+        document.querySelector(".dialog-message:last-child").scrollIntoView({behavior: "auto", block: "start"})
       }
     } else {
       if (props.unreadLetters.length > 0) {
@@ -245,44 +260,64 @@ onUnmounted(() => {
 
 <style scoped>
 .dialog {
-  margin-left: 10px;
-  height: 70vh;
+  height: calc(100vh - 176px);
   background-color: #f4f5f7;
   position: relative;
 }
 
 .dialog-list {
-  height: 63%;
-  padding: 8px 8px;
+  height: calc(100% - 210px);
+  padding: 8px 0 8px 8px;
   overflow-y: auto;
 }
 
 .dialog-item {
-  /*margin-bottom: 1rem;*/
+  min-height: 48px;
+  padding: 0 8px 8px;
+  overflow: hidden;
 }
 
-.user-info {
-  display: flex;
-  align-items: center;
-  margin-bottom: 3px;
+.own-user {
+  float: right;
 }
 
-.user-item {
-  margin-right: 5px;
-  font-size: 14px;
+.own-content {
+  float: right;
+  max-width: 480px;
+  margin: 0 5px;
+  background-color: #95ec69;
+  border-radius: 8px 0 8px 8px;
+  padding: 4px 8px;
+}
+
+.peer-user {
+  float: left;
+}
+
+.peer-content {
+  float: left;
+  max-width: 480px;
+  margin: 0 5px;
+  background-color: #ffffff;
+  border-radius: 0 8px 8px 8px;
+  padding: 4px 8px;
 }
 
 .user-avatar {
   cursor: pointer;
 }
 
-.content-item {
-  margin-left: 1.2rem;
+.dialog-time {
+  color: #999999;
+  font-size: 12px;
+  padding: 10px 0 10px;
+  text-align: center;
 }
 
 .send-box {
+  height: 183px;
   border-top: 1px solid #d8d8d8;
-  padding: 0 10px;
+  padding: 5px;
 }
 
 .send-img-box {

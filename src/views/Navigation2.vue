@@ -11,6 +11,7 @@
         <el-col class="nav-item" :span="12">
           <el-menu class="nav-user" :default-active="route.path" router mode="horizontal"
                    :ellipsis="false" background-color="#FFFFFF00">
+            <el-menu-item index="" @click="router.push('/message/letter')">私信</el-menu-item>
             <el-sub-menu index="/message">
               <template #title>
                 消息
@@ -60,9 +61,9 @@ const router = useRouter()
 const route = useRoute()
 const zoneList = [
   ["/", "首页"],
-  ["/zone/1", "闲聊"],
-  ["/zone/2", "学习"],
-  ["/zone/3", "交易"],
+  // ["/zone/1", "闲聊"],
+  // ["/zone/2", "学习"],
+  // ["/zone/3", "交易"],
 ]
 const signout = async () => {
   await clearUserState()
@@ -140,7 +141,7 @@ function init() {
     reconnect(wsUrl)
   }
   window.ws.onmessage = (e) => {
-    store.commit("addMessage", [JSON.parse(e.data).message_type, 1])
+    store.commit("addMessage", [JSON.parse(e.data).message_type,1])
   }
 }
 

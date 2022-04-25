@@ -33,7 +33,7 @@
             <div class="zone-intro">
               <el-avatar class="zone-logo" :size="70" :src="zone.logo" @click="gotoZone(idx)"></el-avatar>
               <div class="zone-text">
-                <span class="zone-title" @click="gotoZone(idx)">{{ zone.title }}</span>
+                <div class="zone-title" @click="gotoZone(idx)">{{ zone.title }}</div>
                 <div>{{ zone.slogan }}</div>
               </div>
             </div>
@@ -195,12 +195,17 @@ onActivated(() => {
 
 .zone-text {
   margin: 0.8em 0 0 1em;
+  flex-grow: 1;
+  cursor: pointer;
 }
 
 .zone-title {
   font-size: 1.2em;
   font-weight: bold;
-  cursor: pointer;
+}
+
+.zone-text:hover .zone-title {
+  color: #ff6262;
 }
 
 .hot-card {

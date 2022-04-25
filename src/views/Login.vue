@@ -7,7 +7,7 @@
           <el-form-item label="帐号" prop="username">
             <el-input v-model="loginForm.username" type="text" autocomplete="on" ref="accountInput"></el-input>
           </el-form-item>
-          <el-form-item label="密码" prop="password">
+          <el-form-item label="密码" prop="password" @keyup.exact.enter="signin">
             <el-input v-model="loginForm.password" type="password" show-password autocomplete="off"></el-input>
           </el-form-item>
           <el-button type="primary" size="large" style="width: 100%;" :loading="loading" @click="signin">
