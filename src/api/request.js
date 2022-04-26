@@ -1,5 +1,8 @@
 import axios from "axios"
 import store from "@/store"
+import router from "@/router"
+import {aw} from "../../dist/assets/index.bc12b408.js"
+import {clearUserState} from "@/api/user.js"
 
 const request = axios.create({
   // baseURL: "http://101.33.218.141:15656",
@@ -30,7 +33,11 @@ request.interceptors.response.use((res) => {
       } else if (err.response.status === 400) {
         store.commit("alert", {message: "请求参数错误", type: "error"})
       } else if (err.response.status === 403) {
+        store.commit('clearOwnInfo')
+        store.commit('clearMessage')
         store.commit("alert", {message: "帐号或IP被封禁，请联系管理员", type: "error"})
+        await router.push("/login")
+        return err.response.data
       } else if (err.response.status === 404) {
         store.commit("alert", {message: "404 (Not Found)", type: "error"})
       } else {

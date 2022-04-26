@@ -4,7 +4,7 @@
       <template v-if="!noFound">
         <el-card shadow="never">
           <template #header>
-            <div class="card-header">f
+            <div class="card-header">
               <div class="header-title">{{ post.post_name }}</div>
               <div>
                 <el-button type="primary" :plain="onlyLzText==='只看楼主'" @click="toggleOnlyLz">
