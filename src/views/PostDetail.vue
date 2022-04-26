@@ -4,7 +4,7 @@
       <template v-if="!noFound">
         <el-card shadow="never">
           <template #header>
-            <div class="card-header">
+            <div class="card-header">f
               <div class="header-title">{{ post.post_name }}</div>
               <div>
                 <el-button type="primary" :plain="onlyLzText==='只看楼主'" @click="toggleOnlyLz">
@@ -328,17 +328,21 @@ const delComment = (idx, cid) => {
   commentsList.value[idx].splice(commentsList.value[idx].findIndex((i) => i.cid === cid), 1)
 }
 //
-const onlyLz = ref("false")
+const onlyLz = ref(false)
 const onlyLzText = ref("只看楼主")
 const toggleOnlyLz = () => {
-  if (onlyLz.value) {
-    let tmpComments = []
-    comments.value.forEach((v, i) => {
-      if (v.isLz) tmpComments.push(v)
+  if (!onlyLz.value) {
+    let tmpCommentsList = []
+    commentsList.value.forEach((v) => {
+      v.forEach((v2) => {
+        if (v.isLz) tmpCommentsList.push(v2)
+      })
     })
-    comments.value = tmpComments
+    commentsList.value = tmpCommentsList
     onlyLzText.value = "取消只看楼主"
   } else {
+    activePage=-1
+    commentsList.value=[]
     getComments().then(() => {
       onlyLzText.value = "只看楼主"
     })
