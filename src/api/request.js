@@ -1,8 +1,6 @@
 import axios from "axios"
 import store from "@/store"
 import router from "@/router"
-import {aw} from "../../dist/assets/index.bc12b408.js"
-import {clearUserState} from "@/api/user.js"
 
 const request = axios.create({
   // baseURL: "http://101.33.218.141:15656",
