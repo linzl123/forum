@@ -75,7 +75,7 @@
           </el-row>
           <el-divider></el-divider>
           <!--    评论-->
-          <div v-for="(comments, idx) in commentsList" :key="'c' + idx + onlyLzText">
+          <div v-for="(comments, idx) in commentsList" :key="'c' + idx">
             <div v-for="comment in comments" :key="'cc' + comment.cid" class="comment-item">
               <comment-detail :lz-uid="lzUid" :comment="comment" :idx="idx" @getReplies="getReplies(comment)"
                 @delComment="delComment(idx, $event)">
@@ -195,37 +195,17 @@ const getComments = async () => {
     reqComments[i] = getCommentWithRepliesByCid(v)
   })
   let resComments = await Promise.all(reqComments)
-  let reqUser = null
-  let reqAgree = null
-  if (onlyLz.value) {
-    reqUser = []
-    reqAgree = []
-    resComments.forEach((v, i) => {
-      v.cid = activePageIds[i]
-      v.comment_time = v.comment_time.slice(0, 10) + " " + v.comment_time.slice(11, 16)
-      v.img_id = getImg(v.img_id)
-      v.someone_be_at = JSON.parse(v.someone_be_at)
-      if (lzUid.value === v.u_id) {
-        v.isLz = true
-        reqUser.push(getUserByUid(v.u_id))
-        reqAgree.push(getCommentAgree(v.cid))
-      } else {
-        resComments.splice(i, 1)
-      }
-    })
-  } else {
-    reqUser = Array(activePageIds.length)
-    reqAgree = Array(activePageIds.length)
-    resComments.forEach((v, i) => {
-      v.cid = activePageIds[i]
-      v.comment_time = v.comment_time.slice(0, 10) + " " + v.comment_time.slice(11, 16)
-      v.img_id = getImg(v.img_id)
-      v.someone_be_at = JSON.parse(v.someone_be_at)
-      if (lzUid.value === v.u_id) v.isLz = true
-      reqUser[i] = getUserByUid(v.u_id)
-      reqAgree[i] = getCommentAgree(v.cid)
-    })
-  }
+  let reqUser = Array(activePageIds.length)
+  let reqAgree = Array(activePageIds.length)
+  resComments.forEach((v, i) => {
+    v.cid = activePageIds[i]
+    v.comment_time = v.comment_time.slice(0, 10) + " " + v.comment_time.slice(11, 16)
+    v.img_id = getImg(v.img_id)
+    v.someone_be_at = JSON.parse(v.someone_be_at)
+    if (lzUid.value === v.u_id) v.isLz = true
+    reqUser[i] = getUserByUid(v.u_id)
+    reqAgree[i] = getCommentAgree(v.cid)
+  })
   let resUser = await Promise.all(reqUser)
   let resAgree = await Promise.all(reqAgree)
   resComments.forEach((v, i) => {
@@ -347,42 +327,21 @@ const onlyLzText = ref("只看楼主")
 const toggleOnlyLz = () => {
   if (!onlyLz.value) {
     let tmpCommentsList = []
-    let tmpComments = []
     commentsList.value.forEach((v) => {
-      if (tmpComments.length === POST_PER_PAGE) {
-        tmpCommentsList.push(tmpComments)
-        tmpComments = []
-      }
       v.forEach((v2) => {
-        if (v2.isLz) tmpComments.push(v2)
+        if (v.isLz) tmpCommentsList.push(v2)
       })
     })
-    if (tmpComments.length !== 0) {
-      tmpCommentsList.push(tmpComments)
-    }
     commentsList.value = tmpCommentsList
     onlyLzText.value = "取消只看楼主"
-    nextTick(() => {
-      relisten()
-    })
   } else {
     activePage = -1
     commentsList.value = []
     getComments().then(() => {
       onlyLzText.value = "只看楼主"
-      nextTick(() => {
-        relisten()
-      })
     })
   }
   onlyLz.value = !onlyLz.value
-}
-const relisten = () => {
-  getPostsObserver.disconnect()
-  const element = elementList[elementList.length - (Math.ceil(POST_PER_PAGE / 2))]
-  if (element) {
-    getPostsObserver.observe(element)
-  }
 }
 // 赞同 or 不赞同
 const UNKNOWN_COLOR = "#8a8a8a"
@@ -457,11 +416,9 @@ const disagree = async () => {
 }
 
 .lz-icon::after {
-  display: block;
   position: absolute;
-  top: -1px;
-  left: -20px;
-  font-size: 12px;
+  display: block;
+  font-size: 5px;
   width: 5em;
   height: 1em;
   content: "\697c\4e3b";
